@@ -3,14 +3,16 @@ import csv
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
-POINT_NUMBER = 200
+from func import *
+
+TRAINING_DATA_NUM = 1000
+TEST_DATA_NUM = 100
 
 # polygons = np.loadtxt(, delimiter=',', dtype=np.float32);
 polygons_csv = open("../data/problem1/polygons.csv", newline='')
 polygons_reader = csv.reader(polygons_csv, quoting=csv.QUOTE_NONNUMERIC);
 
-index = 0
-for line in polygons_reader:
+for index, line in enumerate(polygons_reader):
     polygon_coords = []
     for i in range(0, len(line), 2):
         polygon_coords.append([line[i], line[i+1]])
@@ -23,20 +25,27 @@ for line in polygons_reader:
     x_max = bounds[2] + half_x_dist
     y_max = bounds[3] + half_y_dist
 
-    pc = []
-    for step in range(POINT_NUMBER):
-        x_random = float("{0:.3f}".format(np.random.uniform(x_min, x_max)))
-        y_random = float("{0:.3f}".format(np.random.uniform(y_min, y_max)))
-        point = Point(x_random,y_random)
-        isIn = int(polygon.contains(point))
-        pc.append([x_random, y_random, isIn])
+    xy = [x_min, x_max, y_min, y_max]
+    # training data
+    training_pc = make_point_list(polygon, xy, TRAINING_DATA_NUM)
 
-    points_csv = open("../data/problem1/points_" + str(index) + ".csv", 'w', encoding='utf-8', newline='')
-    points_writer = csv.writer(points_csv)
-    points_writer.writerow(POINT_NUMBER)
-    for row in pc:
-        points_writer.writerow(row)
-    points_csv.close()
+    # test data
+    test_pc = make_point_list(polygon, xy, TEST_DATA_NUM)
+
+    training_csv = open("../data/problem1/training_" + str(index) + ".csv", 'w', encoding='utf-8', newline='')
+    training_writer = csv.writer(training_csv)
+    training_writer.writerow([TRAINING_DATA_NUM])
+    for row in training_pc:
+        training_writer.writerow(row)
+    training_csv.close()
+
+    test_csv = open("../data/problem1/test_" + str(index) + ".csv", 'w', encoding='utf-8', newline='')
+    test_writer = csv.writer(test_csv)
+    test_writer.writerow([TEST_DATA_NUM])
+    for row in test_pc:
+        test_writer.writerow(row)
+    test_csv.close()
+
     index += 1
 
 polygons_csv.close()
