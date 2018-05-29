@@ -5,8 +5,8 @@ from shapely.geometry.polygon import Polygon
 
 from func import *
 
-TRAINING_DATA_NUM = 1000
-TEST_DATA_NUM = 100
+TRAINING_DATA_NUM = 10000
+TEST_DATA_NUM = 500
 
 # polygons = np.loadtxt(, delimiter=',', dtype=np.float32);
 polygons_csv = open("../data/problem1/polygons.csv", newline='')
@@ -18,12 +18,12 @@ for index, line in enumerate(polygons_reader):
         polygon_coords.append([line[i], line[i+1]])
     polygon = Polygon(polygon_coords)
     bounds = polygon.bounds
-    half_x_dist = abs(bounds[0] - bounds[2]) / 2.0
-    half_y_dist = abs(bounds[1] - bounds[3]) / 2.0
-    x_min = bounds[0] - half_x_dist
-    y_min = bounds[1] - half_y_dist
-    x_max = bounds[2] + half_x_dist
-    y_max = bounds[3] + half_y_dist
+    x_buffer = abs(bounds[0] - bounds[2]) / 5.0
+    y_buffer = abs(bounds[1] - bounds[3]) / 5.0
+    x_min = bounds[0] - x_buffer
+    y_min = bounds[1] - y_buffer
+    x_max = bounds[2] + x_buffer
+    y_max = bounds[3] + y_buffer
 
     xy = [x_min, x_max, y_min, y_max]
     # training data
