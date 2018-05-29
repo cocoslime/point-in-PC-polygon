@@ -2,6 +2,7 @@ import numpy as np
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
+
 def make_random_polygon(numSides, rand_range):
     sides = 0
     coords = []
@@ -16,12 +17,11 @@ def make_random_polygon(numSides, rand_range):
         sides += 1
 
     polygon = Polygon(coords)
-    if polygon.is_simple():
+    if polygon.is_simple:
         return coords
     else:
         print("one more random")
         return make_random_polygon(numSides, rand_range)
-
 
 
 def make_point_list(polygon, rand_range, point_num):

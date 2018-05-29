@@ -1,7 +1,7 @@
 import random
 import shutil
 import os
-from func import *
+from func1 import *
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 tf.set_random_seed(777)  # for reproducibility
 
