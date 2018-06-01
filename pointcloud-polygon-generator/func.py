@@ -10,7 +10,7 @@ from numpy import ones, vstack
 # ================== Problem 2 ===================
 
 Equation = collections.namedtuple('Equation', 'a b c')  # ax + by + c = 0
-PCP_Point = collections.namedtuple('PCP_Point', 'x y type') # type -  false : boundary, true : test
+PCP_Point = collections.namedtuple('PCP_Point', 'x y type') # type -  0 : boundary, 1 : test
 
 
 def make_equation_list(x_data,  y_data):
@@ -62,9 +62,9 @@ def create_polygon(x_coords, y_coords):
     return Polygon(xy)
 
 
-def generate_points_along_sides(x_data, y_data, max_buffer_dist, equations, points_per_line):
+def generate_points_along_sides(x_data, y_data, max_buffer_dist, equations, point_num):
     pc = []
-    for step in range(points_per_line * len(equations)):
+    for step in range(point_num):
         r_index = random.randrange(0, len(equations))
         x_coords = [x_data[r_index], x_data[r_index+1]]
         y_coords = [y_data[r_index], y_data[r_index+1]]
@@ -94,7 +94,7 @@ def generate_points_along_sides(x_data, y_data, max_buffer_dist, equations, poin
             y_random = np.random.uniform(min_y, max_y, 1)[0]
         else:
             return
-        pc.append(PCP_Point(x_random, y_random, False))
+        pc.append(PCP_Point(x_random, y_random, 0))
     return pc
 
 
@@ -108,7 +108,7 @@ def make_test_point_list(polygon, rand_range, point_num):
         point = Point(x_random, y_random)
         is_in = int(polygon.contains(point))
         is_in_num += is_in
-        pc.append(PCP_Point(x_random, y_random, True))
+        pc.append(PCP_Point(x_random, y_random, 1))
         label.append(is_in)
     if (is_in_num == 5) | (is_in_num == 0):
         return make_test_point_list(polygon, rand_range, point_num)
