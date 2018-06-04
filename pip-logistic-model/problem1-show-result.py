@@ -3,7 +3,7 @@ import numpy as np
 import csv
 
 PROBLEM_INDEX = 1
-DATASET_INDEX = 0
+DATASET_INDEX = 2
 RESULT_FILE = "problem1-05"
 
 DATA_PATH = "../data/problem"+str(PROBLEM_INDEX)+"/"

@@ -16,7 +16,7 @@ BOUNDARY_POINTS_NUM = 32 * 32
 TRAINING_NUM = 1000
 TEST_NUM = 100
 LEARNING_RATE = 0.0005
-MAX_STEP = 501
+MAX_STEP = 1001
 
 DATA_FOLDER = "buffer_010"
 
@@ -26,13 +26,20 @@ test_x_data, test_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/test_
 X = tf.placeholder(tf.float32, [None, (BOUNDARY_POINTS_NUM + 1) * 2], name='x-input')
 Y = tf.placeholder(tf.float32, [None, 1], name='y-input')
 
+keep_prob = tf.placeholder(tf.float32)
+
 W1, b1, L1 = make_layer_relu("W1", X, (BOUNDARY_POINTS_NUM + 1) * 2, 1024)
+L1 = tf.nn.dropout(L1, keep_prob=keep_prob)
 
 # Hidden Layer
 W2, b2, L2 = make_layer_relu("W2", L1, 1024, 1024)
+L2 = tf.nn.dropout(L2, keep_prob=keep_prob)
 W3, b3, L3 = make_layer_relu("W3", L2, 1024, 512)
+L3 = tf.nn.dropout(L3, keep_prob=keep_prob)
 W4, b4, L4 = make_layer_relu("W4", L3, 512, 256)
+L4 = tf.nn.dropout(L4, keep_prob=keep_prob)
 W5, b5, L5 = make_layer_relu("W5", L4, 256, 10)
+L5 = tf.nn.dropout(L5, keep_prob=keep_prob)
 
 W_hypo, b_hypo, hypothesis = make_layer_sigmoid("W6", L5, 10, 1)
 hypothesis = hypothesis * 0.998 + 0.001
@@ -61,23 +68,23 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
 
     for step in range(MAX_STEP):
-        summary, c, _ = sess.run([merged_summary, cost, optimizer], feed_dict={X: train_x_data, Y: train_y_data})
+        summary, c, _ = sess.run([merged_summary, cost, optimizer], feed_dict={X: train_x_data, Y: train_y_data, keep_prob: 0.7})
         writer.add_summary(summary, global_step=step)
 
         if step % int(MAX_STEP / 10) == 0:
             print(step, c)
-            # print("TEST accuarcy ", sess.run(accuracy, feed_dict={X: test_x_data, Y: test_y_data}))
+            # print("TEST accuarcy ", sess.run(accuracy, feed_dict={X: test_x_data, Y: test_y_data, keep_prob: 1.0}))
             assert (c == c)
 
     print("Learning finished\n")
     tf.summary.FileWriterCache.clear()
     writer.close()
 
-    print("\nTrain Accracy : ", sess.run(accuracy, feed_dict={X:train_x_data, Y:train_y_data}))
-    h, c, a = sess.run([hypothesis, predicted, accuracy], feed_dict={X: test_x_data, Y: test_y_data})
+    print("\nTrain Accracy : ", sess.run(accuracy, feed_dict={X:train_x_data, Y:train_y_data, keep_prob:1.0}))
+    h, c, a = sess.run([hypothesis, predicted, accuracy], feed_dict={X: test_x_data, Y: test_y_data, keep_prob:1.0})
     print("\nAccuracy: ", a)
 
-    result_filename = "../result/problem2_01_" + DATA_FOLDER + ".txt"
+    result_filename = "../result/problem2_02_" + DATA_FOLDER + ".txt"
     os.makedirs(os.path.dirname(result_filename), exist_ok=True)
     result = open(result_filename, 'w')
     result.write("%f\n" % a)

@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 from func2 import *
+import matplotlib.cm as cm
 
 TEST_NUM = 100
-RESULT_FILE = "problem2"
+DATA_FOLDER = "buffer_001"
+RESULT_FILE = "problem2_01_" + DATA_FOLDER
 
-DATA_PATH = "../data/problem2/"
-test_x_data, test_y_data = load_data("../data/problem2/test_", TEST_NUM)
+test_x_data, test_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/test_", TEST_NUM)
 RESULT_FILE_PATH = "../result/" + RESULT_FILE + ".txt"
 
 # result file
@@ -17,27 +18,23 @@ result_data = np.loadtxt(RESULT_FILE_PATH, dtype=np.float32, skiprows=1)
 
 # polygon
 for test_i in range(TEST_NUM):
+    # print(result_data[test_i])
+    # print(test_x_data[test_i])
 
-polygons_csv = open(DATA_PATH + "polygons.csv", newline='')
-polygons_reader = csv.reader(polygons_csv, quoting=csv.QUOTE_NONNUMERIC)
-for index, row in enumerate(polygons_reader):
-    if index != DATASET_INDEX:
-        continue
+    coords_x = []
+    coords_y = []
 
-    polygon_coords_x = []
-    polygon_coords_y = []
+    for index, row in enumerate(test_x_data[test_i]):
+        if index <= 1:
+            continue
+        if index % 2 == 0:
+            coords_x.append(row)
+        if index % 2 == 1:
+            coords_y.append(row)
 
-    for i in range(0, len(row), 2):
-        polygon_coords_x.append(row[i])
-        polygon_coords_y.append(row[i+1])
-
-    polygon_coords_x.append(row[0])
-    polygon_coords_y.append(row[1])
-
-    color_data = result_data[:, 0].reshape(result_data.shape[0], 1)
-    plt.scatter(test_data_x, test_data_y, c=color_data)
-    # plt.scatter(train_data_x, train_data_y, c=train_data_label)
-    plt.plot(polygon_coords_x, polygon_coords_y)
+    plt.scatter(coords_x, coords_y, c='b', alpha=.4)
+    if result_data[test_i][0] > 0.5 :
+        plt.scatter(test_x_data[test_i][0], test_x_data[test_i][1], s=100, c='g')
+    else:
+        plt.scatter(test_x_data[test_i][0], test_x_data[test_i][1], s=100, c='r')
     plt.show()
-
-polygons_csv.close()
