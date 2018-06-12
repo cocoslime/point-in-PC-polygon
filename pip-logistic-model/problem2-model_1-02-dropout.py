@@ -10,15 +10,16 @@ import random
 
 from tensorflow.examples.tutorials.mnist import input_data
 
+os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 tf.set_random_seed(777)  # reproducibility
 
-BOUNDARY_POINTS_NUM = 32 * 32
+BOUNDARY_POINTS_NUM = 20 * 20
 TRAINING_NUM = 1000
-TEST_NUM = 100
+TEST_NUM = 300
 LEARNING_RATE = 0.0005
-MAX_STEP = 1001
+MAX_STEP = 2001
 
-DATA_FOLDER = "buffer_010"
+DATA_FOLDER = "buffer_001"
 
 train_x_data, train_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/training_", TRAINING_NUM)
 test_x_data, test_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/test_", TEST_NUM)
