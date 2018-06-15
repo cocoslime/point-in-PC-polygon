@@ -77,7 +77,7 @@ with tf.Session() as sess:
     h, c, a = sess.run([hypothesis, predicted, accuracy], feed_dict={X: test_x_data, Y: test_y_data})
     print("\nAccuracy: ", a)
 
-    result_filename = "../result/problem2_01_" + DATA_FOLDER + ".txt"
+    result_filename = "../result/problem2_model1_01_" + DATA_FOLDER + ".txt"
     os.makedirs(os.path.dirname(result_filename), exist_ok=True)
     result = open(result_filename, 'w')
     result.write("%f\n" % a)

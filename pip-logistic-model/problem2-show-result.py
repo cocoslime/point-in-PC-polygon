@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 
 TEST_NUM = 100
 DATA_FOLDER = "buffer_001"
-RESULT_FILE = "problem2_01_" + DATA_FOLDER
+RESULT_FILE = "problem2_model2_01_" + DATA_FOLDER
 
 test_x_data, test_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/test_", TEST_NUM)
 RESULT_FILE_PATH = "../result/" + RESULT_FILE + ".txt"

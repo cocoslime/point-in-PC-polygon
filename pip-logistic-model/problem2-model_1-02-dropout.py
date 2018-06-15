@@ -8,8 +8,6 @@ from func1 import *
 import random
 # import matplotlib.pyplot as plt
 
-from tensorflow.examples.tutorials.mnist import input_data
-
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 tf.set_random_seed(777)  # reproducibility
 
@@ -85,7 +83,7 @@ with tf.Session() as sess:
     h, c, a = sess.run([hypothesis, predicted, accuracy], feed_dict={X: test_x_data, Y: test_y_data, keep_prob:1.0})
     print("\nAccuracy: ", a)
 
-    result_filename = "../result/problem2_02_" + DATA_FOLDER + ".txt"
+    result_filename = "../result/problem2_model1_02_" + DATA_FOLDER + ".txt"
     os.makedirs(os.path.dirname(result_filename), exist_ok=True)
     result = open(result_filename, 'w')
     result.write("%f\n" % a)
