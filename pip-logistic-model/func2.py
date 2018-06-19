@@ -34,8 +34,6 @@ def grid(data, x_num, y_num, data_range):
     return result
 
 
-
-
 def load_data(pre_path, data_num):
     x_data = []
     y_data = []
