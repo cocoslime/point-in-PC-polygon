@@ -1,5 +1,6 @@
 import numpy as np
 import csv
+import tensorflow as tf
 
 
 def pairwise(iterable):
@@ -34,7 +35,22 @@ def grid(data, x_num, y_num, data_range):
     return result
 
 
-def load_data(pre_path, data_num):
+# load_raster
+def load_raster_data(file_path, width, height):
+    x_data = []
+    y_data = []
+    csvfile = open(file_path, newline='')
+    reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
+    for index, row in enumerate(reader):
+        i_x_data = row[0:-1]
+        i_y_data = [row[-1]]
+        x_data.append(i_x_data)
+        y_data.append(i_y_data)
+
+    return x_data, y_data
+
+
+def load_vector_data(pre_path, data_num):
     x_data = []
     y_data = []
     for i in range(data_num):
@@ -61,3 +77,12 @@ def load_data(pre_path, data_num):
         x_data.extend(i_x_data)
 
     return x_data, y_data
+
+
+def make_decode_CSV_list(file_name_list, record_defaults):
+    filename_queue = tf.train.string_input_producer(file_name_list, shuffle=False, name='filename_queue')
+
+    reader = tf.TextLineReader()
+    key, value = reader.read(filename_queue)
+
+    return tf.decode_csv(value, record_defaults=record_defaults)

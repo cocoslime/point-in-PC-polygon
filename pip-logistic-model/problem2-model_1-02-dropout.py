@@ -19,8 +19,8 @@ MAX_STEP = 2001
 
 DATA_FOLDER = "buffer_001"
 
-train_x_data, train_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/training_", TRAINING_NUM)
-test_x_data, test_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/test_", TEST_NUM)
+train_x_data, train_y_data = load_vector_data("../data/problem2/" + DATA_FOLDER + "/training_", TRAINING_NUM)
+test_x_data, test_y_data = load_vector_data("../data/problem2/" + DATA_FOLDER + "/test_", TEST_NUM)
 
 X = tf.placeholder(tf.float32, [None, (BOUNDARY_POINTS_NUM + 1) * 2], name='x-input')
 Y = tf.placeholder(tf.float32, [None, 1], name='y-input')

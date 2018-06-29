@@ -16,14 +16,14 @@ tf.set_random_seed(777)  # reproducibility
 WIDTH_NUM = 20
 HEIGHT_NUM = 20
 
-TRAINING_NUM = 10000
+TRAINING_NUM = 15000
 TEST_NUM = 1000
 LEARNING_RATE = 0.001
 TRAINING_EPOCHS = 61
 
 BATCH_SIZE = 500
-DATA_FOLDER = "buffer_001"
-NUM_SIDES = list(range(3, 6))
+BUFFER_OPT = "buffer_001"
+NUM_SIDES = list(range(5, 6))
 
 HAS_SUMMARY = False
 
@@ -32,8 +32,8 @@ for numSides in NUM_SIDES:
 
     print(str(numSides) + " =========== LOAD DATA ===========")
 
-    train_x_data, train_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/training_" + str(numSides) + "_", TRAINING_NUM)
-    test_x_data, test_y_data = load_data("../data/problem2/" + DATA_FOLDER + "/test_" + str(numSides) + "_", TEST_NUM)
+    train_x_data, train_y_data = load_vector_data("../data/problem2/" + BUFFER_OPT + "/training_" + str(numSides) + "_", TRAINING_NUM)
+    test_x_data, test_y_data = load_vector_data("../data/problem2/" + BUFFER_OPT + "/test_" + str(numSides) + "_", TEST_NUM)
 
     train_x_data = grid(train_x_data, WIDTH_NUM, HEIGHT_NUM, [-5.0, 5., -5., 5.])  # -1,20,20,1
     test_x_data = grid(test_x_data, WIDTH_NUM, HEIGHT_NUM, [-5.0, 5., -5., 5.])
@@ -150,7 +150,7 @@ for numSides in NUM_SIDES:
         print("\nAccuracy: ", a)
 
         # write result file
-        result_filename = "../result/problem2/model2/" + str(numSides) + "_01_" + DATA_FOLDER + ".txt"
+        result_filename = "../result/problem2/model2/" + str(numSides) + "_01_" + BUFFER_OPT + ".txt"
         os.makedirs(os.path.dirname(result_filename), exist_ok=True)
         result = open(result_filename, 'w')
         result.write("%f\n" % a)

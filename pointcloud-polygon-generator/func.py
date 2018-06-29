@@ -52,13 +52,7 @@ def make_random_polygon(num_sides, rand_range):
         y_random = rand_xy.y
         coords.append([x_random, y_random])
         sides += 1
-
-    polygon = Polygon(coords)
-    if polygon.is_simple:
-        return coords
-    else:
-        print("one more random")
-        return make_random_polygon(num_sides, rand_range)
+    return coords
 
 
 def create_polygon(x_coords, y_coords):
@@ -142,3 +136,25 @@ def make_test_point_list(polygon, rand_range, point_num):
     label = [1] * len(in_pc) + [0] * len(not_in_pc)
     pc = in_pc + not_in_pc
     return pc, label
+
+
+def grid(data, x_num, y_num, data_range):
+    result = np.zeros((x_num, y_num))
+    for point in data:
+        x = point.x
+        y = point.y
+        x_index = find_index(x, data_range[1], data_range[0], x_num)
+        y_index = find_index(y, data_range[3], data_range[2], y_num)
+        if x_index == x_num:
+            x_index -= 1
+        if y_index == y_num:
+            y_index -= 1
+        result[x_index][y_index] = 1
+    # result = result.reshape([x_num, y_num, 1])
+    return result.tolist()
+
+
+def find_index(value, max_v, min_v, num):
+    one_cell = (max_v - min_v) / num
+    index = (value - min_v) / one_cell
+    return int(index)

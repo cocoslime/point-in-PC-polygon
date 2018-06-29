@@ -14,4 +14,18 @@ One model - one vertices num
 
 ### Model 3
 
-Triangle, Rectangle, Polygon, ... => DL
+We don't care about how many sides in one training file.
+
+Only convex hull data will be handled
+
+#### 01
+
+data store in memory
+
+#### 02
+
+batch - using pipeline from file
+
+#### 03
+
+more deep tensors

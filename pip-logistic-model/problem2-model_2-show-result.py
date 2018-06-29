@@ -6,11 +6,11 @@ import matplotlib.cm as cm
 
 TEST_NUM = 1000
 TEST_TARGET = list(range(10, 30))
-NUM_SIDES = "4"
+NUM_SIDES = "5"
 BUFFER_OPT = "buffer_001"
 RESULT_FILE = "problem2/model2/" + NUM_SIDES + "_01_" + BUFFER_OPT + ".txt"
 
-test_x_data, test_y_data = load_data("../data/problem2/" + BUFFER_OPT + "/test_" + NUM_SIDES + "_", TEST_NUM)
+test_x_data, test_y_data = load_vector_data("../data/problem2/vector_pc/" + BUFFER_OPT + "/test_" + NUM_SIDES + "_", TEST_NUM)
 RESULT_FILE_PATH = "../result/" + RESULT_FILE
 
 # result file
