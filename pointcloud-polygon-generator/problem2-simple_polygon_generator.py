@@ -11,8 +11,9 @@ header = __import__("problem2-simple-header")
 
 index = 0
 
-if not os.path.exists(header.POLYGON_DIRECTORY):
-    os.makedirs(header.POLYGON_DIRECTORY)
+polygon_csv = open(header.DATA_DIR + "polygon.csv",
+                   'w', encoding='utf-8', newline='')
+polygon_writer = csv.writer(polygon_csv)
 
 while index < header.DATA_NUMBER:
     numSides = random.randrange(header.NUM_SIDES[0], header.NUM_SIDES[-1])
@@ -28,11 +29,11 @@ while index < header.DATA_NUMBER:
 
     # draw_polygon(polygon)
 
-    polygon_csv = open(header.POLYGON_DIRECTORY + str(index) + ".csv",
-                       'w', encoding='utf-8', newline='')
-    polygon_writer = csv.writer(polygon_csv)
-    polygon_writer.writerow([polygon.area / convex_hull.area, numSides])
-    for xy in polygon_coords:
-        polygon_writer.writerow(xy)
-    polygon_csv.close()
+    '''
+    convex_ratio, numOfSides, [polygon_coords]
+    '''
+    polygon_row = ["{0:.4f}".format(polygon.area / convex_hull.area), numSides]
+    polygon_row.extend([item for sublist in polygon_coords for item in sublist])
+    polygon_writer.writerow(polygon_row)
     index += 1
+polygon_csv.close()

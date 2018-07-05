@@ -5,6 +5,8 @@ from func2 import *
 import matplotlib.cm as cm
 from matplotlib import colors
 
+header = __import__("problem2-model_4-header")
+
 WIDTH_NUM = 20
 HEIGHT_NUM = 20
 
@@ -17,33 +19,10 @@ WHOLE_RANGE = [-5.0, 5., -5., 5.]
 BUFFER_OPT = "buffer_001"
 RASTER_DATA_DIR = "../data/problem2/simple/raster_pc/" + BUFFER_OPT
 VECTOR_DATA_DIR = "../data/problem2/simple/vector_pc/" + BUFFER_OPT
-RESULT_FILE = "problem2/model4/02_" + BUFFER_OPT + ".txt"
+RESULT_FILE = "problem2/model4/01_" + BUFFER_OPT + ".txt"
 RESULT_FILE_PATH = "../result/" + RESULT_FILE
 
-# load_raster
-def load_raster_data_in_array(file_path):
-    x_data = []
-    y_data = []
-    convex_rate = []
-    num_sides = []
-    csvfile = open(file_path, newline='')
-    reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
-    for index, row in enumerate(reader):
-        i_x_data = row[0:-3]
-        i_y_data = [row[-3]]
-        i_c_data = row[-2]
-        i_sides_data = row[-1]
-
-        x_data.append(i_x_data)
-        y_data.append(i_y_data)
-        convex_rate.append(i_c_data)
-        num_sides.append(i_sides_data)
-
-    return x_data, y_data, convex_rate, num_sides
-
-
-raster_test_x_data, raster_test_y_data, test_convex_rate, test_num_sides = \
-        load_raster_data_in_array(RASTER_DATA_DIR + "/test.csv")
+raster_test_x_data, raster_test_y_data, test_index_data = header.load_raster_data_in_array(RASTER_DATA_DIR + "/test.csv")
 vector_test_x_data, vector_test_y_data, _ = load_vector_data([VECTOR_DATA_DIR + "/test.csv"], 5000)
 
 tf.reset_default_graph()

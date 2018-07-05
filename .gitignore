@@ -4,3 +4,4 @@ data/*
 result/*
 logs/*
 */__pycache__/
+tmp/

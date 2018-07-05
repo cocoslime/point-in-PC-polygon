@@ -72,7 +72,6 @@ Tensor("MaxPool:0", shape=(?, 10, 10, 32), dtype=float32)
 Tensor("dropout/mul:0", shape=(?, 10, 10, 32), dtype=float32)
 '''
 
-
 W2 = tf.get_variable("W2", shape=[3, 3, 32, 64],
                      initializer=tf.contrib.layers.xavier_initializer())
 L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
@@ -103,7 +102,6 @@ Tensor("Relu_2:0", shape=(?, 5, 5, 128), dtype=float32)
 Tensor("dropout_2/mul:0", shape=(?, 5, 5, 128), dtype=float32)
 Tensor("Reshape_2:0", shape=(?, 3200), dtype=float32)
 '''
-
 
 # FC 5x5x128 inputs -> 10 outputs
 W_FC1 = tf.get_variable("W_FC1", shape=[5 * 5 * 128, 10],

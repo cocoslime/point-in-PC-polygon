@@ -25,17 +25,28 @@ raster_training_writer = csv.writer(raster_training_file)
 vector_training_file = open(VECTOR_DIR + "/training.csv", 'w', encoding='utf-8', newline='')
 vector_training_writer = csv.writer(vector_training_file)
 
+polygons_csv = open(header.DATA_DIR + "polygon.csv", newline='')
+polygons_reader = csv.reader(polygons_csv, quoting=csv.QUOTE_NONNUMERIC)
+
 while train_i < TRAINING_NUMBER:
+    polygons_csv.seek(0)
     data_index = random.randrange(0, header.DATA_NUMBER)
-    polygons_csv = open(header.POLYGON_DIRECTORY + str(data_index)
-                        + ".csv", newline='')
-    polygons_reader = csv.reader(polygons_csv, quoting=csv.QUOTE_NONNUMERIC)
-    headers = next(polygons_reader, None)
+
     x_data = []
     y_data = []
+
     for rid, row in enumerate(polygons_reader):
-        x_data.append(row[0])
-        y_data.append(row[1])
+        if rid == data_index:
+            for index, value in enumerate(row):
+                if index == 0:
+                    convex_ratio = value
+                elif index == 1:
+                    number_sides = value
+                else:
+                    if index % 2 == 0:
+                        x_data.append(value)
+                    else:
+                        y_data.append(value)
 
     x_data.append(x_data[0])
     y_data.append(y_data[0])
@@ -55,11 +66,20 @@ while train_i < TRAINING_NUMBER:
         x_index = find_index(target.x, header.WHOLE_RANGE[1], header.WHOLE_RANGE[0], header.WIDTH_NUM)
         y_index = find_index(target.y, header.WHOLE_RANGE[3], header.WHOLE_RANGE[2], header.HEIGHT_NUM)
         temp_image[x_index][y_index] = 2
-        flat_list = [item for sublist in temp_image for item in sublist]
+
+        '''
+        raster data
+        data_index, [pixel_data], label
+        '''
+        flat_list = [data_index]
+        flat_list.extend([item for sublist in temp_image for item in sublist])
         flat_list.append(label)
-        flat_list.extend(headers)
         raster_training_writer.writerow(flat_list)
 
+        '''
+        vector data
+        data_index, [target_point], [polygon_coords], label
+        '''
         vector_data = [str(data_index), target.x, target.y]
         vector_data.extend(pcp_flatten_list)
         vector_data.append(label)
@@ -84,15 +104,24 @@ vector_test_file = open(VECTOR_DIR + "/test.csv", 'w', encoding='utf-8', newline
 vector_test_writer = csv.writer(vector_test_file)
 
 while test_i < TEST_NUMBER:
+    polygons_csv.seek(0)
     data_index = random.randrange(0, header.DATA_NUMBER)
-    polygons_csv = open(header.POLYGON_DIRECTORY + str(data_index) + ".csv", newline='')
-    polygons_reader = csv.reader(polygons_csv, quoting=csv.QUOTE_NONNUMERIC)
-    headers = next(polygons_reader, None)
+
     x_data = []
     y_data = []
-    for index, row in enumerate(polygons_reader):
-        x_data.append(row[0])
-        y_data.append(row[1])
+
+    for rid, row in enumerate(polygons_reader):
+        if rid == data_index:
+            for index, value in enumerate(row):
+                if index == 0:
+                    convex_ratio = value
+                elif index == 1:
+                    number_sides = value
+                else:
+                    if index % 2 == 0:
+                        x_data.append(value)
+                    else:
+                        y_data.append(value)
 
     x_data.append(x_data[0])
     y_data.append(y_data[0])
@@ -113,16 +142,24 @@ while test_i < TEST_NUMBER:
         x_index = find_index(target.x, header.WHOLE_RANGE[1], header.WHOLE_RANGE[0], header.WIDTH_NUM)
         y_index = find_index(target.y, header.WHOLE_RANGE[3], header.WHOLE_RANGE[2], header.HEIGHT_NUM)
         temp_image[x_index][y_index] = 2
-        flat_list = [item for sublist in temp_image for item in sublist]
+        '''
+        raster data
+        data_index, [pixel_data], label
+        '''
+        flat_list = [data_index]
+        flat_list.extend([item for sublist in temp_image for item in sublist])
         flat_list.append(label)
-        flat_list.extend(headers)
+        raster_test_writer.writerow(flat_list)
 
+        '''
+        vector data
+        data_index, [target_point], [polygon_coords], label
+        '''
         vector_data = [str(data_index), target.x, target.y]
         vector_data.extend(pcp_flatten_list)
         vector_data.append(label)
         vector_test_writer.writerow(vector_data)
 
-        raster_test_writer.writerow(flat_list)
         test_i += 1
         if test_i % 500 == 0:
             print(test_i)
