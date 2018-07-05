@@ -1,4 +1,5 @@
 import random
+import matplotlib.pyplot as plt
 import math
 import numpy as np
 from shapely.geometry import Point
@@ -12,7 +13,13 @@ from numpy import ones, vstack
 # ================== Problem 2 ===================
 
 Equation = collections.namedtuple('Equation', 'a b c')  # ax + by + c = 0
-PCP_Point = collections.namedtuple('PCP_Point', 'x y type') # type -  0 : boundary, 1 : test
+PCP_Point = collections.namedtuple('PCP_Point', 'x y') # type -  0 : boundary, 1 : test
+
+
+def pairwise(iterable):
+    """s -> (s0, s1), (s2, s3), (s4, s5), ..."""
+    a = iter(iterable)
+    return zip(a, a)
 
 
 def make_equation_list(x_data,  y_data):
@@ -106,7 +113,7 @@ def generate_points_along_sides(x_data, y_data, max_buffer_dist, equations, poin
         result_x, result_y = generate_random_point_in_rectangle([x_random, y_random], max_buffer_dist)
         result_x = float("{0:.5f}".format(result_x))
         result_y = float("{0:.5f}".format(result_y))
-        pc.append(PCP_Point(result_x, result_y, 0))
+        pc.append(PCP_Point(result_x, result_y))
     return pc
 
 
@@ -125,9 +132,9 @@ def make_test_point_list(polygon, rand_range, point_num):
         point = make_random_point(rand_range)
         is_in = int(polygon.contains(point))
         if is_in:
-            in_pc.append(PCP_Point(point.x, point.y, 1))
+            in_pc.append(PCP_Point(point.x, point.y))
         else:
-            not_in_pc.append(PCP_Point(point.x, point.y, 1))
+            not_in_pc.append(PCP_Point(point.x, point.y))
         if len(in_pc) + len(not_in_pc) == point_num:
             if len(in_pc) <= 1:
                 not_in_pc = []
@@ -158,3 +165,11 @@ def find_index(value, max_v, min_v, num):
     one_cell = (max_v - min_v) / num
     index = (value - min_v) / one_cell
     return int(index)
+
+
+def draw_polygon(poly):
+    coords = list(poly.exterior.coords)
+    coords_x, coords_y = zip(*coords)
+
+    plt.plot(coords_x, coords_y)
+    plt.show()

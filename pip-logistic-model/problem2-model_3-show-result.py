@@ -24,8 +24,7 @@ tf.reset_default_graph()
 
 for numSides in NUM_SIDES:
     print(str(numSides) + " =========== LOAD DATA ===========")
-    _test_x_data, _test_y_data = load_raster_data("../data/problem2/raster_pc/" + BUFFER_OPT + "/test_" + str(numSides) + ".csv",
-                                                  WIDTH_NUM, HEIGHT_NUM)
+    _test_x_data, _test_y_data = load_raster_data("../data/problem2/raster_pc/" + BUFFER_OPT + "/test_" + str(numSides) + ".csv")
     test_x_data.extend(_test_x_data)
     test_y_data.extend(_test_y_data)
 

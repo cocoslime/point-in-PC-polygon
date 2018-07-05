@@ -14,7 +14,7 @@ One model - one vertices num
 
 ### Model 3
 
-We don't care about how many sides in one training file.
+We don't care about how many sides in one polygon
 
 Only convex hull data will be handled
 
@@ -29,3 +29,7 @@ batch - using pipeline from file
 #### 03
 
 more deep tensors
+
+### Model 4
+
+Not only convex hull data but simple polygon. Each polygon data has own convex hull ratio..

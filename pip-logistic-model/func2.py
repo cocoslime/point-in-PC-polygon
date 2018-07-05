@@ -16,7 +16,7 @@ def grid(data, x_num, y_num, data_range):
     for i_data in data:
         index = 0
         grid_data = np.zeros((x_num, y_num))
-        for x, y in pairwise(i_data):
+        for x, y in i_data:
             x_index = (x - data_range[0]) / one_cell_x
             x_index = int(x_index)
             y_index = int((y - data_range[2]) / one_cell_y)
@@ -26,7 +26,7 @@ def grid(data, x_num, y_num, data_range):
                 y_index -= 1
             if index == 0:
                 grid_data[x_index][y_index] = 2
-            else:
+            elif grid_data[x_index][y_index] == 0:
                 grid_data[x_index][y_index] = 1
             index += 1
         grid_data = grid_data.reshape([x_num, y_num, 1])
@@ -36,53 +36,51 @@ def grid(data, x_num, y_num, data_range):
 
 
 # load_raster
-def load_raster_data(file_path, width, height):
+def load_raster_data(file_path_list):
     x_data = []
     y_data = []
-    csvfile = open(file_path, newline='')
-    reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
-    for index, row in enumerate(reader):
-        i_x_data = row[0:-1]
-        i_y_data = [row[-1]]
-        x_data.append(i_x_data)
-        y_data.append(i_y_data)
+    pl_id = []
+    for file_path in file_path_list:
+        csvfile = open(file_path, newline='')
+        reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
+        for index, row in enumerate(reader):
+            i_x_data = row[0:-1]
+            i_y_data = [row[-1]]
+
+            x_data.append(i_x_data)
+            y_data.append(i_y_data)
 
     return x_data, y_data
 
 
-def load_vector_data(pre_path, data_num):
+def load_vector_data(file_path_list, data_num=50000):
     x_data = []
     y_data = []
-    for i in range(data_num):
-        file_path = pre_path + str(i) + ".csv"
+    pl_id = []
+    for file_path in file_path_list:
         csvfile = open(file_path, newline='')
         reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
 
-        i_data_num = 0
-        i_x_data = []
-        i_boundary = []
         for index, row in enumerate(reader):
-            if index == 0:
-                for label in row:
-                    y_data.append([label])
-                i_data_num = len(row)
-            elif index <= i_data_num:
-                i_x_data.append([row[0], row[1]])
-            else:
-                i_boundary.extend([row[0], row[1]])
+            i_x_data = []
+            if len(x_data) == data_num:
+                break
+            label = row[-1]
+            for x, y in pairwise(row[1:-1]):
+                i_x_data.append([x, y])
 
-        for i_data in i_x_data:
-            i_data.extend(i_boundary)
+            x_data.append(i_x_data)
+            y_data.append([label])
+            pl_id.append(row[0])
 
-        x_data.extend(i_x_data)
-
-    return x_data, y_data
+    return x_data, y_data, pl_id
 
 
 def make_decode_CSV_list(file_name_list, record_defaults):
     filename_queue = tf.train.string_input_producer(file_name_list, shuffle=False, name='filename_queue')
 
     reader = tf.TextLineReader()
+    #reader = tf.TextLineReader(skip_header_lines=1)
     key, value = reader.read(filename_queue)
 
     return tf.decode_csv(value, record_defaults=record_defaults)

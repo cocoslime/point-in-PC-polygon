@@ -9,21 +9,10 @@ import tensorflow as tf
 from func2 import *
 from func1 import *
 import random
+header = __import__("problem2-model_3-header")
 
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.set_random_seed(777)  # reproducibility
-
-# polygon data will grid by WIDTH_NUM X HEIGHT_NUM
-WIDTH_NUM = 20
-HEIGHT_NUM = 20
-
-TEST_NUM = 1000
-LEARNING_RATE = 0.001
-TRAINING_EPOCHS = 501
-
-BATCH_SIZE = 1000
-BUFFER_OPT = "buffer_001"
-NUM_SIDES = list(range(3, 6))
 
 HAS_SUMMARY = False
 
@@ -31,24 +20,21 @@ test_x_data = []
 test_y_data = []
 
 train_file_list = []
+test_file_list = []
 
 start_time = time.time()
 tf.reset_default_graph()
 
-for numSides in NUM_SIDES:
-    print(str(numSides) + " =========== LOAD DATA ===========")
-    _test_x_data, _test_y_data = load_raster_data("../data/problem2/raster_pc/" + BUFFER_OPT + "/test_" + str(numSides) + ".csv",
-                                                  WIDTH_NUM, HEIGHT_NUM)
-    test_x_data.extend(_test_x_data)
-    test_y_data.extend(_test_y_data)
-    file_name = "../data/problem2/raster_pc/" + BUFFER_OPT + "/training_" + str(numSides) + ".csv"
-    train_file_list.append(file_name)
+for numSides in header.NUM_SIDES:
+    test_file_name = "../data/problem2/convex/raster_pc/" + header.BUFFER_OPT + "/test_" + str(numSides) + ".csv"
+    test_file_list.append(test_file_name)
+    train_file_name = "../data/problem2/convex/raster_pc/" + header.BUFFER_OPT + "/training_" + str(numSides) + ".csv"
+    train_file_list.append(train_file_name)
 
-record_defaults = [[0.]] * (WIDTH_NUM * HEIGHT_NUM + 1)
+test_x_data, test_y_data = load_raster_data(test_file_list)
+
+record_defaults = [[0.]] * (header.WIDTH_NUM * header.HEIGHT_NUM + 1)
 train_xy_data = make_decode_CSV_list(train_file_list, record_defaults)
-
-# train_x_data = grid(train_x_data, WIDTH_NUM, HEIGHT_NUM, [-5.0, 5., -5., 5.])  # -1,20,20,1
-# test_x_data = grid(test_x_data, WIDTH_NUM, HEIGHT_NUM, [-5.0, 5., -5., 5.])
 
 print("=========== BATCH ===========")
 train_x_data = train_xy_data[0:-1]
@@ -56,13 +42,13 @@ train_y_data = train_xy_data[-1]
 train_y_data = tf.reshape(train_y_data, [1])
 batch_train_x, batch_train_y = \
     tf.train.shuffle_batch([train_x_data, train_y_data], min_after_dequeue=10000, capacity=50000, enqueue_many=False,
-                           batch_size=BATCH_SIZE, num_threads=8)
+                           batch_size=header.BATCH_SIZE, num_threads=8)
 
 print("=========== BUILD GRAPH ===========")
 
 # input place holders
-X = tf.placeholder(tf.float32,  [None, WIDTH_NUM * HEIGHT_NUM])
-X_img = tf.reshape(X, [-1, WIDTH_NUM, HEIGHT_NUM, 1])
+X = tf.placeholder(tf.float32,  [None, header.WIDTH_NUM * header.HEIGHT_NUM])
+X_img = tf.reshape(X, [-1, header.WIDTH_NUM, header.HEIGHT_NUM, 1])
 Y = tf.placeholder(tf.float32, [None, 1])
 
 keep_prob = tf.placeholder(tf.float32)
@@ -98,7 +84,7 @@ L3 = tf.nn.dropout(L3, keep_prob=keep_prob)
 W_hypo, b_hypo, hypothesis = make_layer_sigmoid("W4", L3, 10, 1)
 hypothesis = hypothesis * 0.999998 + 0.000001
 cost = -tf.reduce_mean(Y * tf.log(hypothesis) + (1 - Y) * tf.log(1 - hypothesis))
-optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(cost)
+optimizer = tf.train.AdamOptimizer(learning_rate=header.LEARNING_RATE).minimize(cost)
 
 # Calculate accuracy
 predicted = tf.cast(hypothesis > 0.5, dtype=tf.float32)
@@ -124,7 +110,7 @@ with tf.Session() as sess:
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(coord=coord)
 
-    for epoch in range(TRAINING_EPOCHS):
+    for epoch in range(header.TRAINING_EPOCHS):
         batch_xs, batch_ys = sess.run([batch_train_x, batch_train_y])
         # batch_ys = np.reshape(batch_ys, (-1, 1))
         print(epoch, " LOAD FILE BATCH DONE")
@@ -148,7 +134,7 @@ with tf.Session() as sess:
     now = time.time()
     print("\n\nTime : ", now - start_time)
     # write result file
-    result_filename = "../result/problem2/model3/02_" + BUFFER_OPT + ".txt"
+    result_filename = "../result/problem2/model3/02_" + header.BUFFER_OPT + ".txt"
     os.makedirs(os.path.dirname(result_filename), exist_ok=True)
     result = open(result_filename, 'w')
     result.write("%f\n" % a)

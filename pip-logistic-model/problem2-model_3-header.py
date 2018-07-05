@@ -1,0 +1,10 @@
+# polygon data will grid by WIDTH_NUM X HEIGHT_NUM
+WIDTH_NUM = 20
+HEIGHT_NUM = 20
+
+LEARNING_RATE = 0.001
+TRAINING_EPOCHS = 1001
+
+BATCH_SIZE = 100
+BUFFER_OPT = "buffer_001"
+NUM_SIDES = list(range(3, 6))

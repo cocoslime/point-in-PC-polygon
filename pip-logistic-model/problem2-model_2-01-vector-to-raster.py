@@ -23,7 +23,7 @@ TRAINING_EPOCHS = 61
 
 BATCH_SIZE = 500
 BUFFER_OPT = "buffer_001"
-NUM_SIDES = list(range(5, 6))
+NUM_SIDES = list(range(4, 6))
 
 HAS_SUMMARY = False
 
@@ -32,8 +32,8 @@ for numSides in NUM_SIDES:
 
     print(str(numSides) + " =========== LOAD DATA ===========")
 
-    train_x_data, train_y_data = load_vector_data("../data/problem2/" + BUFFER_OPT + "/training_" + str(numSides) + "_", TRAINING_NUM)
-    test_x_data, test_y_data = load_vector_data("../data/problem2/" + BUFFER_OPT + "/test_" + str(numSides) + "_", TEST_NUM)
+    train_x_data, train_y_data = load_vector_data(["../data/problem2/convex/vector_pc/" + BUFFER_OPT + "/training_" + str(numSides) + ".csv"], TRAINING_NUM)
+    test_x_data, test_y_data = load_vector_data(["../data/problem2/convex/vector_pc/" + BUFFER_OPT + "/test_" + str(numSides) + ".csv"], TEST_NUM)
 
     train_x_data = grid(train_x_data, WIDTH_NUM, HEIGHT_NUM, [-5.0, 5., -5., 5.])  # -1,20,20,1
     test_x_data = grid(test_x_data, WIDTH_NUM, HEIGHT_NUM, [-5.0, 5., -5., 5.])
