@@ -19,16 +19,24 @@ DATA_DIR = "../data/problem2/simple/raster_pc/" + BUFFER_OPT
 
 start_time = time.time()
 tf.reset_default_graph()
-
-test_x_data, test_y_data, test_index_data = \
-        header.load_raster_data_in_array(DATA_DIR + "/test.csv")
-
-file_name = DATA_DIR + "/training.csv"
-
 record_defaults = [[0.]] * (header.WIDTH_NUM * header.HEIGHT_NUM + 2)
-train_xy_data = make_decode_CSV_list([file_name], record_defaults)
 
-print("=========== BATCH ===========")
+test_xy_data = make_decode_CSV_list([DATA_DIR + "/test.csv"], record_defaults)
+
+print("=========== BATCH - TEST ===========")
+
+test_x_data = test_xy_data[1:-1]
+test_y_data = test_xy_data[-1]
+test_y_data = tf.reshape(test_y_data, [1])
+test_index_data = test_xy_data[0]
+
+batch_test_x, batch_test_y, batch_test_index = tf.train.shuffle_batch([test_x_data, test_y_data, test_index_data],
+                                                       min_after_dequeue=header.MIN_AFTER_DEQUEUE, capacity=header.CAPACITY, enqueue_many=False,
+                                                       batch_size=header.BATCH_SIZE, num_threads=8)
+
+train_xy_data = make_decode_CSV_list([DATA_DIR + "/training.csv"], record_defaults)
+
+print("=========== BATCH - TRAIN ===========")
 
 train_x_data = train_xy_data[1:-1]
 train_y_data = train_xy_data[-1]
@@ -143,11 +151,10 @@ with tf.Session() as sess:
         print(epoch, " LOAD FILE BATCH DONE")
         _cost, _opt, _accuracy = sess.run([cost, optimizer, accuracy], feed_dict={X: batch_xs, Y: batch_ys, keep_prob: 0.7})
 
-        cost_arr.append(_cost)
-        step_arr.append(epoch)
-        train_accuracy_arr.append(_accuracy)
-        test_accuracy = sess.run(accuracy, feed_dict={X: test_x_data, Y: test_y_data, keep_prob: 1.0})
-        test_accuracy_arr.append(test_accuracy)
+        if epoch % 5 == 0:
+            cost_arr.append(_cost)
+            step_arr.append(epoch)
+            train_accuracy_arr.append(_accuracy)
 
         print('cost = ', _cost)
         print('accuracy = ', _accuracy)
@@ -155,11 +162,19 @@ with tf.Session() as sess:
 
     print("Learning finished\n")
 
-    # print("\nTrain Accracy : ", sess.run(accuracy, feed_dict={X: train_x_data, Y: train_y_data, keep_prob: 1.0}))
-    h, c, a = sess.run([hypothesis, predicted, accuracy], feed_dict={X: test_x_data, Y: test_y_data, keep_prob: 1.0})
-    print("\nAccuracy: ", a)
+    # test
+    total_accuracy = 0
+    for epoch in range(int(header.TEST_SIZE / header.BATCH_SIZE)):
+        batch_xs, batch_ys, batch_index = sess.run([batch_test_x, batch_test_y, batch_test_index])
+        h, c, a = sess.run([hypothesis, predicted, accuracy],
+                           feed_dict={X: batch_xs, Y: batch_ys, keep_prob: 1.0})
+        total_accuracy += accuracy
+    total_accuracy /= int(header.TEST_SIZE / header.BATCH_SIZE)
+
+    print("\nAccuracy: ", total_accuracy)
     now = time.time()
     print("\n\nTime : ", int((now - start_time) / 60), "m ",  int(now - start_time) % 60, "s")
+
     # write result file
     result_filename = "../result/problem2/model4/01_" + BUFFER_OPT + ".txt"
     os.makedirs(os.path.dirname(result_filename), exist_ok=True)
