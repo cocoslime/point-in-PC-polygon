@@ -8,8 +8,8 @@ import copy
 header = __import__("problem2-simple-header")
 
 POINTS_PER_POLYGON = 200
-TRAINING_NUMBER = 20000
-TEST_NUMBER = 5000
+TRAINING_NUMBER = 30000
+TEST_NUMBER = 10000
 ONE_POLYGON_TESTNUM = 5
 
 BUFFER = 0.01

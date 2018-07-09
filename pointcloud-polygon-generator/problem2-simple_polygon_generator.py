@@ -27,12 +27,15 @@ while index < header.DATA_NUMBER:
     if convex_hull.area < 2.0:
         continue
 
+    convex_hull_ratio = polygon.area / convex_hull.area
+    if convex_hull_ratio < 0.3 :
+        continue
     # draw_polygon(polygon)
 
     '''
     convex_ratio, numOfSides, [polygon_coords]
     '''
-    polygon_row = ["{0:.4f}".format(polygon.area / convex_hull.area), numSides]
+    polygon_row = ["{0:.4f}".format(convex_hull_ratio), numSides]
     polygon_row.extend([item for sublist in polygon_coords for item in sublist])
     polygon_writer.writerow(polygon_row)
     index += 1
