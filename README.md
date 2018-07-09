@@ -1,6 +1,6 @@
 # point-in-PC-polygon
 
-We query point and polygon. But, That is not normal polygon consist of boundary points. We handle point-cloud polygon. 
+We query point and polygon. But, that is not normal polygon consist of boundary points. We handle point-cloud polygon. 
 Point-cloud polygon means a set of points which are created from polygon boundary. 
 This figure shows what is point-cloud polygon.
 
