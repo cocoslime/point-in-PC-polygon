@@ -34,7 +34,7 @@ result_data = np.loadtxt(RESULT_FILE_PATH, dtype=np.float32, skiprows=1)
 # polygon
 for test_i in TEST_TARGET:
     data = raster_test_x_data[test_i]
-    data = np.reshape(data, [20, 20])
+    data = np.reshape(data, [header.WIDTH_NUM, header.HEIGHT_NUM])
     result = result_data[test_i]
     if result[1] > 0.5:
         print("IN")

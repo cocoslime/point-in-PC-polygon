@@ -7,11 +7,14 @@ WIDTH_NUM = 32
 HEIGHT_NUM = 32
 
 LEARNING_RATE = 0.001
-TRAINING_EPOCHS = 101
+TRAINING_EPOCHS = 501
 CAPACITY = 50000
 MIN_AFTER_DEQUEUE = 10000
 BATCH_SIZE = 100
 
+TEST_SIZE = 10000
+
+DATA_DIR = "../data/problem2/simple/"
 
 # load_raster
 def load_raster_data_in_array(file_path):
