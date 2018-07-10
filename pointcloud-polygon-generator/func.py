@@ -127,7 +127,6 @@ def make_random_point(rand_range):
 def make_test_point_list(polygon, rand_range, point_num):
     in_pc = []
     not_in_pc = []
-    label = []
     while True:
         point = make_random_point(rand_range)
         is_in = int(polygon.contains(point))

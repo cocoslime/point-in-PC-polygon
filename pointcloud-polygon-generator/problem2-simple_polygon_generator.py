@@ -15,7 +15,9 @@ polygon_csv = open(header.DATA_DIR + "polygon.csv",
                    'w', encoding='utf-8', newline='')
 polygon_writer = csv.writer(polygon_csv)
 
-while index < header.DATA_NUMBER:
+cr_num_arr = np.zeros(21)
+
+while index < header.POLYGON_NUMBER:
     numSides = random.randrange(header.NUM_SIDES[0], header.NUM_SIDES[-1])
     polygon_coords = make_random_polygon(numSides, header.WHOLE_RANGE)
     polygon = Polygon(polygon_coords)
@@ -28,9 +30,13 @@ while index < header.DATA_NUMBER:
         continue
 
     convex_hull_ratio = polygon.area / convex_hull.area
-    if convex_hull_ratio < 0.3 :
+    if convex_hull_ratio < 0.5:
         continue
-    # draw_polygon(polygon)
+
+    cr_index = int(convex_hull_ratio / 0.05)
+    if cr_num_arr[cr_index] >= 5000:
+        continue
+    cr_num_arr[cr_index] += 1
 
     '''
     convex_ratio, numOfSides, [polygon_coords]

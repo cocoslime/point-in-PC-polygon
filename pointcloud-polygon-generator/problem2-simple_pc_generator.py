@@ -30,7 +30,7 @@ polygons_reader = csv.reader(polygons_csv, quoting=csv.QUOTE_NONNUMERIC)
 
 while train_i < TRAINING_NUMBER:
     polygons_csv.seek(0)
-    data_index = random.randrange(0, header.DATA_NUMBER)
+    data_index = random.randrange(0, header.POLYGON_NUMBER)
 
     x_data = []
     y_data = []
@@ -57,6 +57,7 @@ while train_i < TRAINING_NUMBER:
     # pointcloud polygon
     pcp_list = generate_points_along_sides(x_data, y_data, BUFFER, equations, POINTS_PER_POLYGON)
     # target points
+
     tp_list, labels = make_test_point_list(pg, header.WHOLE_RANGE, ONE_POLYGON_TESTNUM)
     pcp_flatten_list = [element for tupl in pcp_list for element in tupl]
 
@@ -75,6 +76,8 @@ while train_i < TRAINING_NUMBER:
         flat_list.extend([item for sublist in temp_image for item in sublist])
         flat_list.append(label)
         raster_training_writer.writerow(flat_list)
+
+        # header.draw_raster_row(flat_list)
 
         '''
         vector data
@@ -105,7 +108,7 @@ vector_test_writer = csv.writer(vector_test_file)
 
 while test_i < TEST_NUMBER:
     polygons_csv.seek(0)
-    data_index = random.randrange(0, header.DATA_NUMBER)
+    data_index = random.randrange(0, header.POLYGON_NUMBER)
 
     x_data = []
     y_data = []
@@ -167,3 +170,4 @@ while test_i < TEST_NUMBER:
             break
 raster_test_file.close()
 vector_test_file.close()
+
