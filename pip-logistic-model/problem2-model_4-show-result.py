@@ -11,8 +11,7 @@ WIDTH_NUM = 20
 HEIGHT_NUM = 20
 
 TEST_NUM = 1000
-TEST_TARGET = list(range(1, 1000))
-NUM_SIDES = list(range(3, 6))
+TEST_TARGET = list(range(1, 2))
 
 WHOLE_RANGE = [-5.0, 5., -5., 5.]
 
@@ -22,8 +21,10 @@ VECTOR_DATA_DIR = "../data/problem2/simple/vector_pc/" + BUFFER_OPT
 RESULT_FILE = "problem2/model4/01_" + BUFFER_OPT + ".txt"
 RESULT_FILE_PATH = "../result/" + RESULT_FILE
 
-raster_test_x_data, raster_test_y_data, test_index_data = header.load_raster_data_in_array(RASTER_DATA_DIR + "/test.csv")
-vector_test_x_data, vector_test_y_data, _ = load_vector_data([VECTOR_DATA_DIR + "/test.csv"], 5000)
+DATA_NUM = 3000
+
+raster_test_x_data, raster_test_y_data, test_index_data = load_raster_data([RASTER_DATA_DIR + "/test.csv"], DATA_NUM)
+vector_test_x_data, vector_test_y_data, _ = load_vector_data([VECTOR_DATA_DIR + "/test.csv"], DATA_NUM)
 
 tf.reset_default_graph()
 

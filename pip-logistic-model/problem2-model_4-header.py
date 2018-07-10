@@ -16,6 +16,7 @@ TEST_SIZE = 10000
 
 DATA_DIR = "../data/problem2/simple/"
 
+
 # load_raster
 def load_raster_data_in_array(file_path):
     x_data = []
@@ -33,3 +34,4 @@ def load_raster_data_in_array(file_path):
         index_data.append(_index)
 
     return x_data, y_data, index_data
+

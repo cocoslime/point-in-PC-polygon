@@ -76,37 +76,43 @@ Tensor("dropout_1/mul:0", shape=(?, 8, 8, 64), dtype=float32)
 # L3 ImgIn shape=(?, 8, 8, 64)
 W3 = tf.get_variable("W3", shape=[3, 3, 64, 128],
                      initializer=tf.contrib.layers.xavier_initializer())
-#    Conv      ->(?, 8, 8, 128)
 #    Reshape   ->(?, 8 * 8 * 128) # Flatten them for FC
 L3 = tf.nn.conv2d(L2, W3, strides=[1, 1, 1, 1], padding='SAME')
 L3 = tf.nn.relu(L3)
 L3 = tf.nn.dropout(L3, keep_prob=keep_prob)
-L3_flat = tf.reshape(L3, [-1, 8 * 8 * 128])
 '''
-Tensor("Conv2D_2:0", shape=(?, 8, 8, 128), dtype=float32)
-Tensor("Relu_2:0", shape=(?, 8, 8, 128), dtype=float32)
-Tensor("dropout_2/mul:0", shape=(?, 8, 8, 128), dtype=float32)
-Tensor("Reshape_2:0", shape=(?, 8 * 8 * 128), dtype=float32)
 '''
 
-
-# FC 5x5x128 inputs -> 10 outputs
-W_FC1 = tf.get_variable("W_FC1", shape=[8 * 8 * 128, 10],
+W4 = tf.get_variable("W4", shape=[3, 3, 128, 128],
                      initializer=tf.contrib.layers.xavier_initializer())
-b1 = tf.Variable(tf.random_normal([10]))
-L_FC1 = tf.nn.relu(tf.matmul(L3_flat, W_FC1) + b1)
+#    Conv      ->(?, 8, 8, 128)
+#    Reshape   ->(?, 8 * 8 * 128) # Flatten them for FC
+L4 = tf.nn.conv2d(L3, W4, strides=[1, 1, 1, 1], padding='SAME')
+L4 = tf.nn.relu(L4)
+L4 = tf.nn.dropout(L4, keep_prob=keep_prob)
+L4_flat = tf.reshape(L4, [-1, 8 * 8 * 128])
+
+
+# FC 5x5x128 inputs -> 625 outputs
+W_FC1 = tf.get_variable("W_FC1", shape=[8 * 8 * 128, 625],
+                     initializer=tf.contrib.layers.xavier_initializer())
+b1 = tf.Variable(tf.random_normal([625]))
+L_FC1 = tf.nn.relu(tf.matmul(L4_flat, W_FC1) + b1)
 L_FC1 = tf.nn.dropout(L_FC1, keep_prob=keep_prob)
 '''
-Tensor("Relu_3:0", shape=(?, 10), dtype=float32)
-Tensor("dropout_3/mul:0", shape=(?, 10), dtype=float32)
+Tensor("Relu_3:0", shape=(?, 625), dtype=float32)
+Tensor("dropout_3/mul:0", shape=(?, 625), dtype=float32)
 '''
 
-W_hypo, b_hypo, hypothesis = make_layer_sigmoid("W_FC2", L_FC1, 10, 1)
+W_hypo, b_hypo, hypothesis = make_layer_sigmoid("W_FC2", L_FC1, 625, 1)
 hypothesis = hypothesis * 0.999998 + 0.000001
+cost = -tf.reduce_mean(Y * tf.log(hypothesis) + (1 - Y) * tf.log(1 - hypothesis))
+optimizer = tf.train.AdamOptimizer(learning_rate=header.LEARNING_RATE).minimize(cost)
 
 # Calculate accuracy
 predicted = tf.cast(hypothesis > 0.5, dtype=tf.float32)
 accuracy = tf.reduce_mean(tf.cast(tf.equal(predicted, Y), dtype=tf.float32))
+
 
 saver = tf.train.Saver()
 
@@ -133,7 +139,7 @@ with tf.Session() as sess:
 
     accu_arr = np.zeros((21, ))
     rate_num_arr = np.zeros((21, ))
-    rate_arr = np.arange(0, 21, 1)
+    rate_arr = np.arange(0, 1.05, 0.05)
 
     for epoch in range(int(header.TEST_SIZE / header.BATCH_SIZE)):
         batch_xs, batch_ys, batch_index = sess.run([batch_test_x, batch_test_y, batch_test_index])
@@ -146,12 +152,13 @@ with tf.Session() as sess:
             rate_num_arr[int(cr)] += 1
         print("BATCH ", epoch)
 
-    for i in range(11):
-        accu_arr[i] /= rate_num_arr[i]
+    for i in range(21):
+        if rate_num_arr[i] != 0:
+            accu_arr[i] /= rate_num_arr[i]
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
 
-    ax1.plot(rate_arr, accu_arr)
+    ax1.plot(rate_arr[6:], accu_arr[6:])
 
     ax1.set_xlabel('convex-hull-rate')
     ax1.set_ylabel('accuracy')
@@ -160,6 +167,10 @@ with tf.Session() as sess:
 
     print(accu_arr)
     print(rate_num_arr)
+
+    coord.request_stop()
+    coord.join(threads)
+    sess.close()
 
 
 

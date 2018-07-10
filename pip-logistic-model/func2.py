@@ -36,21 +36,25 @@ def grid(data, x_num, y_num, data_range):
 
 
 # load_raster
-def load_raster_data(file_path_list):
+def load_raster_data(file_path_list, data_num=50000):
     x_data = []
     y_data = []
-    pl_id = []
+    index_data = []
     for file_path in file_path_list:
         csvfile = open(file_path, newline='')
         reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
         for index, row in enumerate(reader):
-            i_x_data = row[0:-1]
+            if len(x_data) >= data_num:
+                break
+            i_x_data = row[1:-1]
             i_y_data = [row[-1]]
+            _index = row[0]
 
             x_data.append(i_x_data)
             y_data.append(i_y_data)
+            index_data.append(_index)
 
-    return x_data, y_data
+    return x_data, y_data, index_data
 
 
 def load_vector_data(file_path_list, data_num=50000):
@@ -63,7 +67,7 @@ def load_vector_data(file_path_list, data_num=50000):
 
         for index, row in enumerate(reader):
             i_x_data = []
-            if len(x_data) == data_num:
+            if len(x_data) >= data_num:
                 break
             label = row[-1]
             for x, y in pairwise(row[1:-1]):
