@@ -178,7 +178,7 @@ with tf.Session() as sess:
     print("\n\nTime : ", int((now - start_time) / 60), "m ",  int(now - start_time) % 60, "s")
 
     # write result file
-    result_filename = "../result/problem2/model4/01_" + BUFFER_OPT + ".txt"
+    result_filename = "../result/problem2/model4/03_" + BUFFER_OPT + ".txt"
     os.makedirs(os.path.dirname(result_filename), exist_ok=True)
     result = open(result_filename, 'w')
     result.write("%f\n" % a)

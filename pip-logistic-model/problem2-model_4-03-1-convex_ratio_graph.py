@@ -158,7 +158,7 @@ with tf.Session() as sess:
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
 
-    ax1.plot(rate_arr[6:], accu_arr[6:])
+    ax1.plot(rate_arr[10:], accu_arr[10:])
 
     ax1.set_xlabel('convex-hull-rate')
     ax1.set_ylabel('accuracy')
