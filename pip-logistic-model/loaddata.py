@@ -81,7 +81,7 @@ def load_vector_data(file_path_list, data_num=50000):
 
 
 def make_decode_CSV_list(file_name_list, record_defaults):
-    filename_queue = tf.train.string_input_producer(file_name_list, shuffle=False, name='filename_queue')
+    filename_queue = tf.train.string_input_producer(file_name_list)
 
     reader = tf.TextLineReader()
     #reader = tf.TextLineReader(skip_header_lines=1)

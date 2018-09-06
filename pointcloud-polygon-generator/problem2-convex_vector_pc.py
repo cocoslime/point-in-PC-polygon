@@ -3,8 +3,8 @@ import random
 import numpy as np
 import csv
 import math
-from func import *
-header = __import__("problem2-convex-header")
+from func_2 import *
+header = __import__("problem2-header")
 
 POINTS_PER_POLYGON = 200
 TRAINING_NUMBER = 10000

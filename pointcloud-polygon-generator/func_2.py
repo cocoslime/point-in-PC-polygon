@@ -13,13 +13,33 @@ from numpy import ones, vstack
 # ================== Problem 2 ===================
 
 Equation = collections.namedtuple('Equation', 'a b c')  # ax + by + c = 0
-PCP_Point = collections.namedtuple('PCP_Point', 'x y') # type -  0 : boundary, 1 : test
+PCP_Point = collections.namedtuple('PCP_Point', 'x y z') # type -  0 : boundary, 1 : test
 
 
 def pairwise(iterable):
     """s -> (s0, s1), (s2, s3), (s4, s5), ..."""
     a = iter(iterable)
     return zip(a, a)
+
+
+def make_random_coordinate_list(num_sides, rand_range):
+    sides = 0
+    coords = []
+    random_start = make_random_coordinate(rand_range)
+    coords.append([random_start[0], random_start[1]])
+
+    while sides + 1 < num_sides:
+        rand_xy = make_random_coordinate(rand_range)
+        coords.append([rand_xy[0], rand_xy[1]])
+        sides += 1
+    return coords
+
+
+def make_random_coordinate(rand_range):
+    x_random = random.randrange(rand_range[0], rand_range[1])
+    y_random = random.randrange(rand_range[2], rand_range[3])
+    return [x_random, y_random]
+
 
 
 def make_equation_list(x_data,  y_data):
@@ -45,21 +65,6 @@ def make_equation(x_coords, y_coords):
     return equ
 
 
-def make_random_polygon(num_sides, rand_range):
-    sides = 0
-    coords = []
-    random_start = make_random_point(rand_range)
-    x_random_start = random_start.x
-    y_random_start = random_start.y
-    coords.append([x_random_start, y_random_start])
-
-    while sides + 1 < num_sides:
-        rand_xy = make_random_point(rand_range)
-        x_random = rand_xy.x
-        y_random = rand_xy.y
-        coords.append([x_random, y_random])
-        sides += 1
-    return coords
 
 
 def create_polygon(x_coords, y_coords):
@@ -90,7 +95,9 @@ def generate_random_point_in_circle(center, buffer):
     return x_value, y_value
 
 
-def generate_points_along_sides(x_data, y_data, max_buffer_dist, equations, point_num):
+def generate_points_along_sides(x_data, y_data, max_buffer_dist, point_num):
+    equations = make_equation_list(x_data, y_data)
+
     pc = []
     for step in range(point_num):
         r_index = random.randrange(0, len(equations))
@@ -116,10 +123,11 @@ def generate_points_along_sides(x_data, y_data, max_buffer_dist, equations, poin
         pc.append(PCP_Point(result_x, result_y))
     return pc
 
-
 def make_random_point(rand_range):
-    x_random = float("{0:.5f}".format(np.random.uniform(rand_range[0], rand_range[1])))
-    y_random = float("{0:.5f}".format(np.random.uniform(rand_range[2], rand_range[3])))
+    x_random = random.randrange(rand_range[0], rand_range[1])
+    y_random = random.randrange(rand_range[2], rand_range[3])
+    # x_random = float("{0:.5f}".format(np.random.uniform(rand_range[0], rand_range[1])))
+    # y_random = float("{0:.5f}".format(np.random.uniform(rand_range[2], rand_range[3])))
     point = Point(x_random, y_random)
     return point
 

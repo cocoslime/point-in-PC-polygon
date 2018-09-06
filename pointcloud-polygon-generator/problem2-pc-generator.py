@@ -3,29 +3,29 @@ import random
 import numpy as np
 import csv
 import math
-from func import *
+from func_2 import *
 import copy
-header = __import__("problem2-simple-header")
+header = __import__("problem2-header")
 
 POINTS_PER_POLYGON = 200
 TRAINING_NUMBER = 30000
 TEST_NUMBER = 10000
 ONE_POLYGON_TESTNUM = 5
 
-BUFFER = 0.01
-DATA_OPT = '001'
-RASTER_DIR = "../data/problem2/simple/raster_pc/buffer_" + DATA_OPT
-VECTOR_DIR = "../data/problem2/simple/vector_pc/buffer_" + DATA_OPT
+BUFFER = 1
+CONVEX_OPT = 'non_convex'
+RASTER_DIR = "../data/problem2/" + CONVEX_OPT + "/raster_pc/"
+VECTOR_DIR = "../data/problem2/" + CONVEX_OPT + "/vector_pc/"
 # MAKE TRAINING DATA
 train_i = 0
 
-raster_training_file = open(RASTER_DIR + "/training.csv", 'w', encoding='utf-8', newline='')
+raster_training_file = open(RASTER_DIR + "/training_" + '{0:03d}'.format(BUFFER) + ".csv", 'w', encoding='utf-8', newline='')
 raster_training_writer = csv.writer(raster_training_file)
 
-vector_training_file = open(VECTOR_DIR + "/training.csv", 'w', encoding='utf-8', newline='')
+vector_training_file = open(VECTOR_DIR + "/training_" + '{0:03d}'.format(BUFFER) + ".csv", 'w', encoding='utf-8', newline='')
 vector_training_writer = csv.writer(vector_training_file)
 
-polygons_csv = open(header.DATA_DIR + "polygon.csv", newline='')
+polygons_csv = open("../data/problem2/" + CONVEX_OPT + "/polygon.csv", newline='')
 polygons_reader = csv.reader(polygons_csv, quoting=csv.QUOTE_NONNUMERIC)
 
 while train_i < TRAINING_NUMBER:
@@ -52,10 +52,9 @@ while train_i < TRAINING_NUMBER:
     y_data.append(y_data[0])
 
     pg = create_polygon(x_data, y_data)
-    equations = make_equation_list(x_data, y_data)
 
     # pointcloud polygon
-    pcp_list = generate_points_along_sides(x_data, y_data, BUFFER, equations, POINTS_PER_POLYGON)
+    pcp_list = generate_points_along_sides(x_data, y_data, BUFFER, POINTS_PER_POLYGON)
     # target points
 
     tp_list, labels = make_test_point_list(pg, header.WHOLE_RANGE, ONE_POLYGON_TESTNUM)

@@ -4,10 +4,9 @@ import matplotlib.pyplot as plt
 
 NUM_SIDES = list(range(3, 10))
 POLYGON_NUMBER = 30000
-WHOLE_RANGE = [-5.0, 5., -5., 5.]
+WHOLE_RANGE = [0, 100, 0, 100]
 WIDTH_NUM = 32
 HEIGHT_NUM = 32
-DATA_DIR = "../data/problem2/simple/"
 
 
 def draw_raster_row(row):

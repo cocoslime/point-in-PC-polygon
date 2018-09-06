@@ -3,7 +3,7 @@ import csv
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
-from func import *
+from func_2 import *
 
 TRAINING_DATA_NUM = 10000
 TEST_DATA_NUM = 500

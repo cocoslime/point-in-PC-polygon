@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import shutil
 import os
 import tensorflow as tf
-from func2 import *
+from loaddata import *
 from func1 import *
 import random
 from pathlib import Path

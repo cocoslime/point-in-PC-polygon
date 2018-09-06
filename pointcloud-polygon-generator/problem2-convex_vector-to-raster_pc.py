@@ -3,9 +3,9 @@ import random
 import numpy as np
 import csv
 import math
-from func import *
+from func_2 import *
 import copy
-header = __import__("problem2-convex-header")
+header = __import__("problem2-header")
 
 POINTS_PER_POLYGON = 200
 ONE_POLYGON_TESTNUM = 5

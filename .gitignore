@@ -5,3 +5,5 @@ result/*
 logs/*
 */__pycache__/
 tmp/
+
+*/node_modules/*
