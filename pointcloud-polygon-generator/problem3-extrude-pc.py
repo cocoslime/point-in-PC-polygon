@@ -138,6 +138,7 @@ def generate_data(solids_reader, vector_writer, raster_writer):
         solids.append(row)
 
     while write_num < MAX_DATA_NUM:
+        row = solids[random.randrange(0, rid + 1)]
         if write_num % 10 == 0:
             print(write_num, "...")
 
@@ -215,15 +216,15 @@ if __name__ == "__main__":
     solids_csv = open(DATA_DIR + CONVEX_OPT + "_solids.csv", newline='')
     solids_reader = csv.reader(solids_csv, quoting=csv.QUOTE_NONNUMERIC)
 
-    raster_test_csv = open(DATA_DIR + CONVEX_OPT + "/raster/" + "test_" + ".csv", 'w', encoding='utf-8', newline='')
+    raster_test_csv = open(DATA_DIR + CONVEX_OPT + "/raster/" + str(VOXEL_PIXEL) + "/test" + ".csv", 'w', encoding='utf-8', newline='')
     raster_test_writer = csv.writer(raster_test_csv)
 
-    vector_test_csv = open(DATA_DIR + CONVEX_OPT + "/vector/" + "test_" + ".csv", 'w', encoding='utf-8', newline='')
+    vector_test_csv = open(DATA_DIR + CONVEX_OPT + "/vector/" + "test" + ".csv", 'w', encoding='utf-8', newline='')
     vector_test_writer = csv.writer(vector_test_csv)
 
     for set_num in range(SET_NUM):
         print("Train ", set_num)
-        raster_train_csv = open(DATA_DIR + CONVEX_OPT + "/raster/" + "training_" + str(set_num) + ".csv", 'w', encoding='utf-8', newline='')
+        raster_train_csv = open(DATA_DIR + CONVEX_OPT + "/raster/" + str(VOXEL_PIXEL) + "/training_" + str(set_num) + ".csv", 'w', encoding='utf-8', newline='')
         raster_train_writer = csv.writer(raster_train_csv)
 
         vector_train_csv = open(DATA_DIR + CONVEX_OPT + "/vector/" + "training_" + str(set_num) + ".csv", 'w', encoding='utf-8', newline='')
@@ -237,7 +238,7 @@ if __name__ == "__main__":
     print("Test ")
 
     solids_csv.seek(0)
-    generate_data(solids_reader, raster_test_writer, vector_test_writer)
+    generate_data(solids_reader, vector_test_writer, raster_test_writer)
     raster_test_csv.close()
     vector_test_csv.close()
 

@@ -20,7 +20,7 @@ cr_num_arr = np.zeros(21)
 
 while index < header.POLYGON_NUMBER:
     numSides = random.randrange(header.NUM_SIDES[0], header.NUM_SIDES[-1])
-    polygon_coords = make_random_point_list(numSides, header.WHOLE_RANGE)
+    polygon_coords = make_random_coordinate_list(numSides, header.WHOLE_RANGE)
     polygon = Polygon(polygon_coords)
     ring = LinearRing(polygon_coords)
     if not ring.is_simple:

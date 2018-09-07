@@ -13,7 +13,6 @@ polygon_csv = open("../data/problem2/convex/polygon.csv",
                        'w', encoding='utf-8', newline='')
 polygon_writer = csv.writer(polygon_csv)
 
-
 while index < header.POLYGON_NUMBER:
     numSides = random.randrange(header.NUM_SIDES[0], header.NUM_SIDES[-1])
     polygon_coords = make_random_coordinate_list(numSides, header.WHOLE_RANGE)
@@ -26,7 +25,7 @@ while index < header.POLYGON_NUMBER:
     '''
     convex_ratio = 1.0, numOfSides, [polygon_coords]
     '''
-    polygon_row = [1.0, numSides]
+    polygon_row = [1.0, len(convex_coords)]
     polygon_row.extend([int(item) for sublist in convex_coords for item in sublist])
     polygon_writer.writerow(polygon_row)
     index += 1
