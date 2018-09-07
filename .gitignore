@@ -3,7 +3,7 @@
 data/*
 result/*
 logs/*
-*/__pycache__/
+*/__pycache__/*
 tmp/
 
 */node_modules/*
