@@ -15,9 +15,9 @@ CONVEX_OPT = 'convex'
 SET_NUM = 5
 DATA_DIR = "../data/problem3/extruded/"
 
-VOXEL_PIXEL = 10
-ONE_AXIS_PIXEL = int(100 / VOXEL_PIXEL)
-VOXEL_SHAPE = (ONE_AXIS_PIXEL, ONE_AXIS_PIXEL, ONE_AXIS_PIXEL)
+VOXEL = 20
+INTERVAL = int(100 / VOXEL)
+VOXEL_SHAPE = (VOXEL, VOXEL, VOXEL)
 Equation = collections.namedtuple('Equation', 'a b c')  # ax + by + c = 0
 
 
@@ -183,25 +183,25 @@ def generate_data(solids_reader, vector_writer, raster_writer):
         '''
         voxel = np.zeros(VOXEL_SHAPE)
         for point in pcp_list:
-            x = int(point[0] / VOXEL_PIXEL)
-            x = min(x, ONE_AXIS_PIXEL - 1)
+            x = int(point[0] / INTERVAL)
+            x = min(x, VOXEL - 1)
             x = max(x, 0)
-            y = int(point[1] / VOXEL_PIXEL)
-            y = min(y, ONE_AXIS_PIXEL - 1)
+            y = int(point[1] / INTERVAL)
+            y = min(y, VOXEL - 1)
             y = max(y, 0)
-            z = int(point[2] / VOXEL_PIXEL)
-            z = min(z, ONE_AXIS_PIXEL - 1)
+            z = int(point[2] / INTERVAL)
+            z = min(z, VOXEL - 1)
             z = max(z, 0)
             voxel[x][y][z] = 1
 
-        x = int(target_point[0] / VOXEL_PIXEL)
-        x = min(x, ONE_AXIS_PIXEL - 1)
+        x = int(target_point[0] / INTERVAL)
+        x = min(x, VOXEL - 1)
         x = max(x, 0)
-        y = int(target_point[1] / VOXEL_PIXEL)
-        y = min(y, ONE_AXIS_PIXEL - 1)
+        y = int(target_point[1] / INTERVAL)
+        y = min(y, VOXEL - 1)
         y = max(y, 0)
-        z = int(target_point[2] / VOXEL_PIXEL)
-        z = min(z, ONE_AXIS_PIXEL - 1)
+        z = int(target_point[2] / INTERVAL)
+        z = min(z, VOXEL - 1)
         z = max(z, 0)
         voxel[x][y][z] = 2
 
@@ -216,18 +216,18 @@ if __name__ == "__main__":
     solids_csv = open(DATA_DIR + CONVEX_OPT + "_solids.csv", newline='')
     solids_reader = csv.reader(solids_csv, quoting=csv.QUOTE_NONNUMERIC)
 
-    raster_test_csv = open(DATA_DIR + CONVEX_OPT + "/raster/" + str(VOXEL_PIXEL) + "/test" + ".csv", 'w', encoding='utf-8', newline='')
+    raster_test_csv = open(DATA_DIR + CONVEX_OPT + "/raster/" + str(VOXEL) + "/test" + ".csv", 'w', encoding='utf-8', newline='')
     raster_test_writer = csv.writer(raster_test_csv)
 
-    vector_test_csv = open(DATA_DIR + CONVEX_OPT + "/vector/" + "test" + ".csv", 'w', encoding='utf-8', newline='')
+    vector_test_csv = open(DATA_DIR + CONVEX_OPT + "/vector/" + str(VOXEL) + "/test" + ".csv", 'w', encoding='utf-8', newline='')
     vector_test_writer = csv.writer(vector_test_csv)
 
     for set_num in range(SET_NUM):
         print("Train ", set_num)
-        raster_train_csv = open(DATA_DIR + CONVEX_OPT + "/raster/" + str(VOXEL_PIXEL) + "/training_" + str(set_num) + ".csv", 'w', encoding='utf-8', newline='')
+        raster_train_csv = open(DATA_DIR + CONVEX_OPT + "/raster/" + str(VOXEL) + "/training_" + str(set_num) + ".csv", 'w', encoding='utf-8', newline='')
         raster_train_writer = csv.writer(raster_train_csv)
 
-        vector_train_csv = open(DATA_DIR + CONVEX_OPT + "/vector/" + "training_" + str(set_num) + ".csv", 'w', encoding='utf-8', newline='')
+        vector_train_csv = open(DATA_DIR + CONVEX_OPT + "/vector/" + str(VOXEL) + "/training_" + str(set_num) + ".csv", 'w', encoding='utf-8', newline='')
         vector_train_writer = csv.writer(vector_train_csv)
 
         solids_csv.seek(0)

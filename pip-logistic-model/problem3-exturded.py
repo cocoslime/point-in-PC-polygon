@@ -11,15 +11,15 @@ from func1 import *
 import random
 from pathlib import Path
 
-CAPACITY = 500
-MIN_AFTER_DEQUEUE = 100
-BATCH_SIZE = 1
+MIN_AFTER_DEQUEUE = 10000
+BATCH_SIZE = 2
+CAPACITY = MIN_AFTER_DEQUEUE + BATCH_SIZE * 10
 LEARNING_RATE = 0.001
 
 CONVEX_OPT = "convex"
-TRAINING_SET = 1
-TRAINING_EPOCHS = 10
-TEST_EPOCH = 40
+TRAINING_SET = 5
+TRAINING_EPOCHS = 100
+TEST_EPOCH = 10
 
 tf.set_random_seed(777)  # reproducibility
 
@@ -33,7 +33,7 @@ record_defaults = [[0.]] * (VOXEL * VOXEL * VOXEL + 1)
 
 print("=========== BATCH - TEST ===========")
 
-test_xy_data = make_decode_CSV_list([DATA_DIR + "test_.csv"], record_defaults)
+test_xy_data = make_decode_CSV_list([DATA_DIR + str(VOXEL) + "/test.csv"], record_defaults)
 
 test_x_data = test_xy_data[0:-1]
 test_y_data = test_xy_data[-1]
@@ -44,16 +44,16 @@ batch_test_x, batch_test_y = tf.train.batch([test_x_data, test_y_data], enqueue_
 print("=========== BATCH - TRAIN ===========")
 train_file_list = []
 for i in range(TRAINING_SET):
-    train_file_list.append(DATA_DIR + "training_" + str(i) + ".csv")
+    train_file_list.append(DATA_DIR + str(VOXEL) + "/training_" + str(i) + ".csv")
 train_xy_data = make_decode_CSV_list(train_file_list, record_defaults)
 
 train_x_data = train_xy_data[0:-1]
 train_y_data = train_xy_data[-1]
 train_y_data = tf.reshape(train_y_data, [1])
 
-# batch_train_x, batch_train_y, = tf.train.shuffle_batch([train_x_data, train_y_data],
-# min_after_dequeue=MIN_AFTER_DEQUEUE, capacity=CAPACITY, enqueue_many=False, batch_size=BATCH_SIZE, num_threads=8)
-batch_train_x, batch_train_y, = tf.train.batch([train_x_data, train_y_data], enqueue_many=False, batch_size=BATCH_SIZE, num_threads=8)
+batch_train_x, batch_train_y, = tf.train.shuffle_batch([train_x_data, train_y_data],
+min_after_dequeue=MIN_AFTER_DEQUEUE, capacity=CAPACITY, enqueue_many=False, batch_size=BATCH_SIZE, num_threads=8)
+# batch_train_x, batch_train_y, = tf.train.batch([train_x_data, train_y_data], enqueue_many=False, batch_size=BATCH_SIZE, num_threads=8)
 
 print("=========== BUILD GRAPH ===========")
 
@@ -167,9 +167,9 @@ with tf.Session() as sess:
             cost_arr.append(_cost)
             step_arr.append(epoch)
             train_accuracy_arr.append(_accuracy)
+            print('cost = ', _cost)
+            print('accuracy = ', _accuracy)
 
-        print('cost = ', _cost)
-        print('accuracy = ', _accuracy)
         assert (_cost == _cost)  # check nan
 
     print("Learning finished\n")
@@ -195,6 +195,7 @@ with tf.Session() as sess:
     for item1, item2 in zip(h, c):
         result.write("%s %s\n" % (item1[0], item2[0]))
 
+    os.makedirs(os.path.dirname("../tmp/problem3-extruded/model.ckpt"), exist_ok=True)
     save_path = saver.save(sess, "../tmp/problem3-extruded/model.ckpt")
 
     coord.request_stop()

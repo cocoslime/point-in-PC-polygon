@@ -61,9 +61,11 @@ print("=========== BUILD GRAPH ===========")
 X = tf.placeholder(tf.float32,  [None, VOXEL * VOXEL * VOXEL])
 X_img = tf.reshape(X, [-1, VOXEL, VOXEL, VOXEL, 1])
 Y = tf.placeholder(tf.float32, [None, 1])
-
 keep_prob = tf.placeholder(tf.float32)
 
+'''
+LAYER 1
+'''
 W1 = tf.get_variable("W1", shape=[3, 3, 3, 1, 32],
                      initializer=tf.contrib.layers.xavier_initializer())
 L1 = tf.nn.conv3d(X_img, W1, strides=[1, 1, 1, 1, 1], padding='SAME')
@@ -72,13 +74,10 @@ L1 = tf.nn.max_pool3d(L1, ksize=[1, 2, 2, 2, 1],
                     strides=[1, 2, 2, 2, 1], padding='SAME')
 
 L1 = tf.nn.dropout(L1, keep_prob=keep_prob, name="dr1")
-'''
-Tensor("Conv3D:0", shape=(?, 20, 20, 20, 32), dtype=float32)
-Tensor("MaxPool3D:0", shape=(?, 10, 10, 10, 32), dtype=float32)
 
 '''
-
-
+LAYER 2
+'''
 W2 = tf.get_variable("W2", shape=[3, 3, 3, 32, 64],
                      initializer=tf.contrib.layers.xavier_initializer())
 L2 = tf.nn.conv3d(L1, W2, strides=[1, 1, 1, 1, 1], padding='SAME')
@@ -86,11 +85,10 @@ L2 = tf.nn.relu(L2)
 L2 = tf.nn.max_pool3d(L2, ksize=[1, 2, 2, 2, 1],
                     strides=[1, 2, 2, 2, 1], padding='SAME')
 L2 = tf.nn.dropout(L2, keep_prob=keep_prob, name="dr2")
-'''
-Tensor("Conv3D_1:0", shape=(?, 10, 10, 10, 64), dtype=float32)
-Tensor("MaxPool3D_1:0", shape=(?, 5, 5, 5, 64), dtype=float32)
-'''
 
+'''
+LAYER 3
+'''
 W4 = tf.get_variable("W4", shape=[3, 3, 3, 64, 128],
                      initializer=tf.contrib.layers.xavier_initializer())
 L4 = tf.nn.conv3d(L2, W4, strides=[1, 1, 1, 1, 1], padding='SAME')
@@ -100,22 +98,26 @@ L4 = tf.nn.dropout(L4, keep_prob=keep_prob, name="dr4")
 L4_flat = tf.reshape(L4, [-1, 3 * 3 * 3 * 128])
 
 '''
-Tensor("Conv3D_3:0", shape=(?, 3, 3, 3, 128), dtype=float32)
-
+LAYER 4
 '''
-
 W_FC1 = tf.get_variable("W_FC1", shape=[3 * 3 * 3 * 128, 625],
                      initializer=tf.contrib.layers.xavier_initializer())
 b1 = tf.Variable(tf.random_normal([625]))
 L_FC1 = tf.nn.relu(tf.matmul(L4_flat, W_FC1) + b1)
 L_FC1 = tf.nn.dropout(L_FC1, keep_prob=keep_prob)
 
+'''
+LAYER 5
+'''
 W_FC2 = tf.get_variable("W_FC2", shape=[625, 100],
                      initializer=tf.contrib.layers.xavier_initializer())
 b2 = tf.Variable(tf.random_normal([100]))
 L_FC2 = tf.nn.relu(tf.matmul(L_FC1, W_FC2) + b2)
 L_FC2 = tf.nn.dropout(L_FC2, keep_prob=keep_prob)
 
+'''
+LAYER 6
+'''
 W_hypo, b_hypo, hypothesis = make_layer_sigmoid("W_FC3", L_FC2, 100, 1)
 hypothesis = hypothesis * 0.999998 + 0.000001
 cost = -tf.reduce_mean(Y * tf.log(hypothesis) + (1 - Y) * tf.log(1 - hypothesis))
@@ -144,7 +146,7 @@ with tf.Session() as sess:
     threads = tf.train.start_queue_runners(coord=coord)
 
     print("RESTORE VARIABLE")
-    # saver.restore(sess, "../tmp/problem3-extruded/model.ckpt")
+    saver.restore(sess, "../tmp/problem3-extruded-10/model.ckpt")
 
     for epoch in range(TRAINING_EPOCHS):
         batch_xs, batch_ys = sess.run([batch_train_x, batch_train_y])
