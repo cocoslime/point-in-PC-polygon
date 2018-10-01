@@ -13,13 +13,16 @@ from pathlib import Path
 
 MIN_AFTER_DEQUEUE = 10000
 BATCH_SIZE = 2
+
 CAPACITY = MIN_AFTER_DEQUEUE + BATCH_SIZE * 10
 LEARNING_RATE = 0.001
 
 CONVEX_OPT = "convex"
 TRAINING_SET = 5
 TRAINING_EPOCHS = 100
-TEST_EPOCH = 10
+
+TEST_BATCH_SIZE = 1
+TEST_EPOCHS = 100
 
 tf.set_random_seed(777)  # reproducibility
 
@@ -39,7 +42,7 @@ test_x_data = test_xy_data[0:-1]
 test_y_data = test_xy_data[-1]
 test_y_data = tf.reshape(test_y_data, [1])
 
-batch_test_x, batch_test_y = tf.train.batch([test_x_data, test_y_data], enqueue_many=False, batch_size=BATCH_SIZE, num_threads=8)
+batch_test_x, batch_test_y = tf.train.batch([test_x_data, test_y_data], enqueue_many=False, batch_size=TEST_BATCH_SIZE, num_threads=8)
 
 print("=========== BATCH - TRAIN ===========")
 train_file_list = []
@@ -156,7 +159,7 @@ with tf.Session() as sess:
     threads = tf.train.start_queue_runners(coord=coord)
 
     print("RESTORE VARIABLE")
-    # saver.restore(sess, "../tmp/problem3-extruded/model.ckpt")
+    saver.restore(sess, "../tmp/problem3-extruded/model.ckpt")
 
     for epoch in range(TRAINING_EPOCHS):
         batch_xs, batch_ys = sess.run([batch_train_x, batch_train_y])
@@ -170,30 +173,49 @@ with tf.Session() as sess:
             print('cost = ', _cost)
             print('accuracy = ', _accuracy)
 
+            # test
+            total_accuracy = 0
+            for epoch in range(TEST_EPOCHS):
+                batch_xs, batch_ys = sess.run([batch_test_x, batch_test_y])
+                _h, _c, _a = sess.run([hypothesis, predicted, accuracy],
+                                      feed_dict={X: batch_xs, Y: batch_ys, keep_prob: 1.0})
+                total_accuracy += _a
+            total_accuracy /= TEST_EPOCHS
+            print("TEST : ", total_accuracy)
+
         assert (_cost == _cost)  # check nan
 
     print("Learning finished\n")
 
     # test
     total_accuracy = 0
-    for epoch in range(TEST_EPOCH):
+    h_arr = []
+    c_arr = []
+    y_arr = []
+    for epoch in range(TEST_EPOCHS):
         batch_xs, batch_ys = sess.run([batch_test_x, batch_test_y])
-        h, c, a = sess.run([hypothesis, predicted, accuracy],
+        _h, _c, _a = sess.run([hypothesis, predicted, accuracy],
                            feed_dict={X: batch_xs, Y: batch_ys, keep_prob: 1.0})
-        total_accuracy += a
-    total_accuracy /= TEST_EPOCH
+        h_arr.extend(_h)
+        c_arr.extend(_c)
+        y_arr.extend(batch_ys)
+        total_accuracy += _a
+    total_accuracy /= TEST_EPOCHS
 
     print("\nAccuracy: ", total_accuracy)
     now = time.time()
     print("\n\nTime : ", int((now - start_time) / 60), "m ",  int(now - start_time) % 60, "s")
 
     # write result file
-    result_filename = "../result/problem3/extruded/result.txt"
+    result_filename = "../result/problem3/extruded/20x20/result.txt"
     os.makedirs(os.path.dirname(result_filename), exist_ok=True)
     result = open(result_filename, 'w')
     result.write("%f\n" % total_accuracy)
-    for item1, item2 in zip(h, c):
-        result.write("%s %s\n" % (item1[0], item2[0]))
+    for item1, item2, item3 in zip(h_arr, c_arr, y_arr):
+        print(item1)
+        print(item2)
+        print(item3)
+        result.write("%s %s %s\n" % (item1[0], item2[0], item3[0]))
 
     os.makedirs(os.path.dirname("../tmp/problem3-extruded/model.ckpt"), exist_ok=True)
     save_path = saver.save(sess, "../tmp/problem3-extruded/model.ckpt")
