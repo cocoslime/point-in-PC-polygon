@@ -7,7 +7,10 @@ import csv
 from func_2 import *
 import scipy.stats as stats
 import os
-header = __import__("problem2-header")
+
+NUM_SIDES = list(range(3, 10))
+POLYGON_NUMBER = 30000
+WHOLE_RANGE = [0, 100, 0, 100]
 
 index = 0
 
@@ -18,16 +21,16 @@ polygon_writer = csv.writer(polygon_csv)
 # To keep convex ratio balance
 cr_num_arr = np.zeros(21)
 
-while index < header.POLYGON_NUMBER:
-    numSides = random.randrange(header.NUM_SIDES[0], header.NUM_SIDES[-1])
-    polygon_coords = make_random_coordinate_list(numSides, header.WHOLE_RANGE)
+while index < POLYGON_NUMBER:
+    numSides = random.randrange(NUM_SIDES[0], NUM_SIDES[-1])
+    polygon_coords = make_random_coordinate_list(numSides, WHOLE_RANGE)
     polygon = Polygon(polygon_coords)
     ring = LinearRing(polygon_coords)
     if not ring.is_simple:
         continue
 
     convex_hull = polygon.convex_hull
-    if convex_hull.area < 2.0:
+    if convex_hull.area < 500:
         continue
 
     convex_hull_ratio = float(polygon.area) / float(convex_hull.area)

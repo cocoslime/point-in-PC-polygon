@@ -2,9 +2,6 @@ import numpy as np
 from matplotlib import colors
 import matplotlib.pyplot as plt
 
-NUM_SIDES = list(range(3, 10))
-POLYGON_NUMBER = 30000
-WHOLE_RANGE = [0, 100, 0, 100]
 WIDTH_NUM = 32
 HEIGHT_NUM = 32
 

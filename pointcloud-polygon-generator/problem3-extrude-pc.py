@@ -15,6 +15,7 @@ CONVEX_OPT = 'convex'
 SET_NUM = 5
 DATA_DIR = "../data/problem3/extruded/"
 
+MINIMUM_RATIO = 0.6
 VOXEL = 20
 INTERVAL = int(100 / VOXEL)
 VOXEL_SHAPE = (VOXEL, VOXEL, VOXEL)
@@ -137,6 +138,9 @@ def generate_data(solids_reader, vector_writer, raster_writer):
     for rid, row in enumerate(solids_reader):
         solids.append(row)
 
+    vector_rows = []
+    raster_rows = []
+
     while write_num < MAX_DATA_NUM:
         row = solids[random.randrange(0, rid + 1)]
         if write_num % 10 == 0:
@@ -165,7 +169,7 @@ def generate_data(solids_reader, vector_writer, raster_writer):
             target_point, label = make_target_point(x_data, y_data, height)
 
         if not label:
-            if num_of_out > MAX_DATA_NUM * 0.66:
+            if num_of_out > MAX_DATA_NUM * MINIMUM_RATIO:
                 continue
             num_of_out += 1
         '''
@@ -175,7 +179,8 @@ def generate_data(solids_reader, vector_writer, raster_writer):
         vector_row = target_point
         vector_row.extend(pcp_flatten_list)
         vector_row.append(int(label))
-        vector_writer.writerow(vector_row)
+        # vector_writer.writerow(vector_row)
+        vector_rows.append(vector_row)
 
         '''
         raster data
@@ -207,9 +212,14 @@ def generate_data(solids_reader, vector_writer, raster_writer):
 
         raster_row = [int(item2) for sublist in voxel for item in sublist for item2 in item]
         raster_row.append(int(label))
-        raster_writer.writerow(raster_row)
+        # raster_writer.writerow(raster_row)
+        raster_rows.append(raster_row)
 
         write_num += 1
+    random.shuffle(vector_rows)
+    random.shuffle(raster_rows)
+    vector_writer.writerows(vector_rows)
+    raster_writer.writerows(raster_rows)
 
 
 if __name__ == "__main__":

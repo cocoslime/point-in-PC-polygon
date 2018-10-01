@@ -3,11 +3,15 @@ import random
 import numpy as np
 import csv
 import math
-from func_2 import *
+from problem2_func import *
 import copy
-header = __import__("problem2-header")
 
-POINTS_PER_POLYGON = 200
+PIXEL = 32
+
+POLYGON_NUMBER = 30000
+WHOLE_RANGE = [0, 100, 0, 100]
+
+POINTS_PER_POLYGON = 700
 TRAINING_NUMBER = 30000
 TEST_NUMBER = 10000
 ONE_POLYGON_TESTNUM = 5
@@ -19,10 +23,10 @@ VECTOR_DIR = "../data/problem2/" + CONVEX_OPT + "/vector_pc/"
 # MAKE TRAINING DATA
 train_i = 0
 
-raster_training_file = open(RASTER_DIR + "/training_" + '{0:03d}'.format(BUFFER) + ".csv", 'w', encoding='utf-8', newline='')
+raster_training_file = open(RASTER_DIR + "p" + str(POINTS_PER_POLYGON) + "_training_" + '{0:03d}'.format(BUFFER) + ".csv", 'w', encoding='utf-8', newline='')
 raster_training_writer = csv.writer(raster_training_file)
 
-vector_training_file = open(VECTOR_DIR + "/training_" + '{0:03d}'.format(BUFFER) + ".csv", 'w', encoding='utf-8', newline='')
+vector_training_file = open(VECTOR_DIR + "p" + str(POINTS_PER_POLYGON) + "_training_" + '{0:03d}'.format(BUFFER) + ".csv", 'w', encoding='utf-8', newline='')
 vector_training_writer = csv.writer(vector_training_file)
 
 polygons_csv = open("../data/problem2/" + CONVEX_OPT + "/polygon.csv", newline='')
@@ -30,7 +34,7 @@ polygons_reader = csv.reader(polygons_csv, quoting=csv.QUOTE_NONNUMERIC)
 
 while train_i < TRAINING_NUMBER:
     polygons_csv.seek(0)
-    data_index = random.randrange(0, header.POLYGON_NUMBER)
+    data_index = random.randrange(0, POLYGON_NUMBER)
 
     x_data = []
     y_data = []
@@ -47,6 +51,7 @@ while train_i < TRAINING_NUMBER:
                         x_data.append(value)
                     else:
                         y_data.append(value)
+            break
 
     x_data.append(x_data[0])
     y_data.append(y_data[0])
@@ -57,14 +62,14 @@ while train_i < TRAINING_NUMBER:
     pcp_list = generate_points_along_sides(x_data, y_data, BUFFER, POINTS_PER_POLYGON)
     # target points
 
-    tp_list, labels = make_test_point_list(pg, header.WHOLE_RANGE, ONE_POLYGON_TESTNUM)
+    tp_list, labels = make_target_point_list(pg, WHOLE_RANGE, ONE_POLYGON_TESTNUM)
     pcp_flatten_list = [element for tupl in pcp_list for element in tupl]
 
-    basis_image = grid(pcp_list, header.WIDTH_NUM, header.HEIGHT_NUM, header.WHOLE_RANGE)
+    basis_image = grid(pcp_list, PIXEL, PIXEL, WHOLE_RANGE)
     for target, label in zip(tp_list, labels):
         temp_image = copy.deepcopy(basis_image)
-        x_index = find_index(target.x, header.WHOLE_RANGE[1], header.WHOLE_RANGE[0], header.WIDTH_NUM)
-        y_index = find_index(target.y, header.WHOLE_RANGE[3], header.WHOLE_RANGE[2], header.HEIGHT_NUM)
+        x_index = find_index(target.x, WHOLE_RANGE[1], WHOLE_RANGE[0], PIXEL)
+        y_index = find_index(target.y, WHOLE_RANGE[3], WHOLE_RANGE[2], PIXEL)
         temp_image[x_index][y_index] = 2
 
         '''
@@ -99,15 +104,15 @@ vector_training_file.close()
 # MAKE TEST DATA
 test_i = 0
 
-raster_test_file = open(RASTER_DIR + "/test.csv", 'w', encoding='utf-8', newline='')
+raster_test_file = open(RASTER_DIR + "p" + str(POINTS_PER_POLYGON) + "_test_" + '{0:03d}'.format(BUFFER) + ".csv", 'w', encoding='utf-8', newline='')
 raster_test_writer = csv.writer(raster_test_file)
 
-vector_test_file = open(VECTOR_DIR + "/test.csv", 'w', encoding='utf-8', newline='')
+vector_test_file = open(VECTOR_DIR + "p" + str(POINTS_PER_POLYGON) + "_test_" + '{0:03d}'.format(BUFFER) + ".csv", 'w', encoding='utf-8', newline='')
 vector_test_writer = csv.writer(vector_test_file)
 
 while test_i < TEST_NUMBER:
     polygons_csv.seek(0)
-    data_index = random.randrange(0, header.POLYGON_NUMBER)
+    data_index = random.randrange(0, POLYGON_NUMBER)
 
     x_data = []
     y_data = []
@@ -129,20 +134,19 @@ while test_i < TEST_NUMBER:
     y_data.append(y_data[0])
 
     pg = create_polygon(x_data, y_data)
-    equations = make_equation_list(x_data, y_data)
 
     # pointcloud polygon
-    pcp_list = generate_points_along_sides(x_data, y_data, BUFFER, equations, POINTS_PER_POLYGON)
+    pcp_list = generate_points_along_sides(x_data, y_data, BUFFER, POINTS_PER_POLYGON)
     # target points
-    tp_list, labels = make_test_point_list(pg, header.WHOLE_RANGE, ONE_POLYGON_TESTNUM)
+    tp_list, labels = make_target_point_list(pg, WHOLE_RANGE, ONE_POLYGON_TESTNUM)
     pcp_flatten_list = [element for tupl in pcp_list for element in tupl]
 
     # Write CSV FILE
-    basis_image = grid(pcp_list, header.WIDTH_NUM, header.HEIGHT_NUM, header.WHOLE_RANGE)
+    basis_image = grid(pcp_list, PIXEL, PIXEL, WHOLE_RANGE)
     for target, label in zip(tp_list, labels):
         temp_image = copy.deepcopy(basis_image)
-        x_index = find_index(target.x, header.WHOLE_RANGE[1], header.WHOLE_RANGE[0], header.WIDTH_NUM)
-        y_index = find_index(target.y, header.WHOLE_RANGE[3], header.WHOLE_RANGE[2], header.HEIGHT_NUM)
+        x_index = find_index(target.x, WHOLE_RANGE[1], WHOLE_RANGE[0], PIXEL)
+        y_index = find_index(target.y, WHOLE_RANGE[3], WHOLE_RANGE[2], PIXEL)
         temp_image[x_index][y_index] = 2
         '''
         raster data

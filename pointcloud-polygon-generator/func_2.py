@@ -30,8 +30,14 @@ def make_random_coordinate_list(num_sides, rand_range):
 
     while sides + 1 < num_sides:
         rand_xy = make_random_coordinate(rand_range)
+        if len(coords) > 0:
+            if rand_xy[0] == coords[-1][0] and rand_xy[1] == coords[-1][1]:
+                continue
+            if rand_xy[0] == coords[0][0] and rand_xy[1] == coords[0][1]:
+                continue
         coords.append([rand_xy[0], rand_xy[1]])
         sides += 1
+
     return coords
 
 
@@ -39,7 +45,6 @@ def make_random_coordinate(rand_range):
     x_random = random.randrange(rand_range[0], rand_range[1])
     y_random = random.randrange(rand_range[2], rand_range[3])
     return [x_random, y_random]
-
 
 
 def make_equation_list(x_data,  y_data):
@@ -63,8 +68,6 @@ def make_equation(x_coords, y_coords):
     m, c = lstsq(A, y_coords)[0] # y = mx + c
     equ = Equation(m, -1, c)
     return equ
-
-
 
 
 def create_polygon(x_coords, y_coords):
