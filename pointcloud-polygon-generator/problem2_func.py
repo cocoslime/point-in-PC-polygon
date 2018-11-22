@@ -72,7 +72,7 @@ def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
         (low - mean) / sd, (upp - mean) / sd, loc=mean, scale=sd)
 
 
-def make_target_point_list(polygon, rand_range, point_num):
+def make_target_point_list(polygon, rand_range, point_num, minimum_in=1):
     in_pc = []
     not_in_pc = []
     while True:
@@ -83,7 +83,7 @@ def make_target_point_list(polygon, rand_range, point_num):
         else:
             not_in_pc.append(PCP_Point(point.x, point.y))
         if len(in_pc) + len(not_in_pc) == point_num:
-            if len(in_pc) <= 1:
+            if len(in_pc) < minimum_in:
                 not_in_pc = []
             else:
                 break

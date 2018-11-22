@@ -1,12 +1,13 @@
 import time
-import matplotlib.pyplot as plt
-import shutil
 import os
-import tensorflow as tf
 from loaddata import *
 from func1 import *
+import importlib
 import random
 from pathlib import Path
+
+models = __import__("problem2-models")
+importer = __import__("problem2-import")
 
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 tf.set_random_seed(777)  # reproducibility
@@ -23,33 +24,26 @@ CAPACITY = MIN_AFTER_DEQUEUE + BATCH_SIZE * 10
 
 TEST_EPOCHS = 100
 
-# DENSITY_OPT = "p200"
 BUFFER_OPT = "001"
 DATA_DIR = "../data/problem2/non_convex/raster_pc/"
 
-TRAINING_FILE_ARR = []
-TEST_FILE_ARR = []
+TRAINING_FILE_ARR, TEST_FILE_ARR = importer.load_density_dir(DATA_DIR, "density", BUFFER_OPT)
 
-DENS_ARR = [50, 75, 100, 150, 200, 250, 300, 350, 700]
-for DENSITY_OPT in DENS_ARR:
-    DENSITY_OPT = "p" + str(DENSITY_OPT)
-    TRAINING_FILEPATH = DATA_DIR + DENSITY_OPT + "_training_" + BUFFER_OPT + ".csv"
-    TEST_FILEPATH = DATA_DIR + DENSITY_OPT + "_test_"+BUFFER_OPT + ".csv"
-    TRAINING_FILE_ARR.append(TRAINING_FILEPATH)
-    TEST_FILE_ARR.append(TEST_FILEPATH)
+# load_points_dir()
 
-SAVER_FILEPATH = "../tmp/problem2/everycase/model.ckpt"
+SAVER_FILEPATH = "../tmp/problem2/model2/model.ckpt"
 
-record_defaults = [[0.]] * (PIXEL * PIXEL + 2)
+record_defaults = [[0.]] * (PIXEL * PIXEL + 3)
 
 test_xy_data = make_decode_CSV_list(TEST_FILE_ARR, record_defaults)
 
 print("=========== BATCH - TEST ===========")
 
-test_x_data = test_xy_data[1:-1]
+test_x_data = test_xy_data[2:-1]
 test_y_data = test_xy_data[-1]
 test_y_data = tf.reshape(test_y_data, [1])
 test_index_data = test_xy_data[0]
+test_density_data = test_xy_data[1]
 
 # batch_test_x, batch_test_y, batch_test_index = tf.train.batch([test_x_data, test_y_data, test_index_data], enqueue_many=False, batch_size=BATCH_SIZE, num_threads=8)
 batch_test_x, batch_test_y, batch_test_index = tf.train.shuffle_batch([test_x_data, test_y_data, test_index_data], min_after_dequeue=MIN_AFTER_DEQUEUE, capacity=CAPACITY, enqueue_many=False, batch_size=BATCH_SIZE, num_threads=8)
@@ -58,7 +52,7 @@ train_xy_data = make_decode_CSV_list(TRAINING_FILE_ARR, record_defaults)
 
 print("=========== BATCH - TRAIN ===========")
 
-train_x_data = train_xy_data[1:-1]
+train_x_data = train_xy_data[2:-1]
 train_y_data = train_xy_data[-1]
 train_y_data = tf.reshape(train_y_data, [1])
 train_index_data = train_xy_data[0]
@@ -73,61 +67,9 @@ print("=========== BUILD GRAPH ===========")
 X = tf.placeholder(tf.float32,  [None, PIXEL * PIXEL])
 X_img = tf.reshape(X, [-1, PIXEL, PIXEL, 1])
 Y = tf.placeholder(tf.float32, [None, 1])
-
 keep_prob = tf.placeholder(tf.float32)
 
-W1 = tf.get_variable("W1", shape=[3, 3, 1, 32], initializer=tf.contrib.layers.xavier_initializer())
-L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='SAME')
-L1 = tf.nn.relu(L1)
-L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-L1 = tf.nn.dropout(L1, keep_prob=keep_prob)
-'''
-Tensor("Conv2D:0", shape=(?, 32, 32, 32), dtype=float32)
-Tensor("Relu:0", shape=(?, 32, 32, 32), dtype=float32)
-Tensor("MaxPool:0", shape=(?, 16, 16, 32), dtype=float32)
-Tensor("dropout/mul:0", shape=(?, 16, 16, 32), dtype=float32)
-'''
-
-
-W2 = tf.get_variable("W2", shape=[3, 3, 32, 64], initializer=tf.contrib.layers.xavier_initializer())
-L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
-L2 = tf.nn.relu(L2)
-L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1],
-                    strides=[1, 2, 2, 1], padding='SAME')
-L2 = tf.nn.dropout(L2, keep_prob=keep_prob)
-'''
-Tensor("Conv2D_1:0", shape=(?, 16, 16, 64), dtype=float32)
-Tensor("Relu_1:0", shape=(?, 16, 16, 64), dtype=float32)
-Tensor("MaxPool_1:0", shape=(?, 8, 8, 64), dtype=float32)
-Tensor("dropout_1/mul:0", shape=(?, 8, 8, 64), dtype=float32)
-'''
-
-W3 = tf.get_variable("W3", shape=[3, 3, 64, 128], initializer=tf.contrib.layers.xavier_initializer())
-L3 = tf.nn.conv2d(L2, W3, strides=[1, 1, 1, 1], padding='SAME')
-L3 = tf.nn.relu(L3)
-L3 = tf.nn.dropout(L3, keep_prob=keep_prob)
-'''
-'''
-
-W4 = tf.get_variable("W4", shape=[3, 3, 128, 128], initializer=tf.contrib.layers.xavier_initializer())
-L4 = tf.nn.conv2d(L3, W4, strides=[1, 1, 1, 1], padding='SAME')
-L4 = tf.nn.relu(L4)
-L4 = tf.nn.dropout(L4, keep_prob=keep_prob)
-L4_flat = tf.reshape(L4, [-1, 8 * 8 * 128])
-
-
-# FC 5x5x128 inputs -> 625 outputs
-W_FC1 = tf.get_variable("W_FC1", shape=[8 * 8 * 128, 625], initializer=tf.contrib.layers.xavier_initializer())
-b1 = tf.Variable(tf.random_normal([625]))
-L_FC1 = tf.nn.relu(tf.matmul(L4_flat, W_FC1) + b1)
-L_FC1 = tf.nn.dropout(L_FC1, keep_prob=keep_prob)
-'''
-Tensor("Relu_3:0", shape=(?, 625), dtype=float32)
-Tensor("dropout_3/mul:0", shape=(?, 625), dtype=float32)
-'''
-
-W_hypo, b_hypo, hypothesis = make_layer_sigmoid("W_FC2", L_FC1, 625, 1)
-hypothesis = hypothesis * 0.999998 + 0.000001
+hypothesis = models.model2(X_img, keep_prob)
 cost = -tf.reduce_mean(Y * tf.log(hypothesis) + (1 - Y) * tf.log(1 - hypothesis))
 optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(cost)
 
@@ -194,16 +136,8 @@ with tf.Session() as sess:
     print("\nAccuracy: ", total_accuracy)
     print(result)
 
-    # write result file
-    # result_filename = "../result/problem2/model4/03_" + BUFFER_OPT + ".txt"
-    # os.makedirs(os.path.dirname(result_filename), exist_ok=True)
-    # result_file = open(result_filename, 'w')
-    # result_file.write("%f\n" % a)
-    # for item1, item2 in zip(h, c):
-    #     result_file.write("%s %s\n" % (item1[0], item2[0]))
-    
     os.makedirs(os.path.dirname(SAVER_FILEPATH), exist_ok=True)
-    # save_path = saver.save(sess, SAVER_FILEPATH)
+    save_path = saver.save(sess, SAVER_FILEPATH)
 
     coord.request_stop()
     coord.join(threads)

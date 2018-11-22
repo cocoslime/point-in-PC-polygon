@@ -88,3 +88,4 @@ def make_decode_CSV_list(file_name_list, record_defaults):
     key, value = reader.read(filename_queue)
 
     return tf.decode_csv(value, record_defaults=record_defaults)
+
